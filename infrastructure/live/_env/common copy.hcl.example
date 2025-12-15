@@ -1,0 +1,4 @@
+locals {
+  container_port = 3000
+  domain_name    = "domain_name.dev"
+}

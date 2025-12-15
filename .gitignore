@@ -1,0 +1,76 @@
+# ============================================
+# Secrets & Environment Variables
+# ============================================
+common.hcl
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+*secret*
+*credentials*
+*password*
+*_rsa
+*_rsa.pub
+*.asc
+
+# ============================================
+# Terraform / Terragrunt / IaC
+# ============================================
+# State files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terragrunt cache
+.terragrunt-cache/
+
+# Variable files with sensitive data
+*.tfvars
+!*.tfvars.example
+!example.tfvars
+
+# Terraform directories
+.terraform/
+.terraform.lock.hcl
+terraform.rc
+.terraformrc
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Plans
+*.tfplan
+*.plan
+
+# ============================================
+# Cloud Provider CLIs
+# ============================================
+.aws/
+*serviceaccount*.json
+*credentials*.json
+
+# ============================================
+# OS Files
+# ============================================
+.DS_Store
+.DS_Store?
+
+# ============================================
+# Logs & Temp Files
+# ============================================
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+tmp/
+temp/
+*.tmp
+.cache/
+.temp/
