@@ -68,12 +68,12 @@ resource "aws_ecs_task_definition" "main" {
   }])
 
   tags = {
-    Name = "${var.project_name}-${var.environment}-task"
+    Name = "${var.project_name}-${var.environment}-task=definition"
   }
 }
 
 resource "aws_ecs_service" "main" {
-  name            = "${var.project_name}-${var.environment}-service"
+  name            = "${var.project_name}-${var.environment}-ecs-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.main.arn
   desired_count   = var.desired_count
