@@ -15,6 +15,8 @@ resource "aws_ecr_repository" "main" {
   }
 }
 
+data "aws_region" "current" {}
+
 resource "aws_ecr_lifecycle_policy" "main" {
   repository = aws_ecr_repository.main.name
 

@@ -1,0 +1,107 @@
+name: CI - Build, Deploy to Dev
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: eu-west-2
+  ECR_REPOSITORY: ecs-project
+  ECS_CLUSTER_DEV: ecs-project-dev-cluster
+  ECS_SERVICE_DEV: ecs-project-dev-service
+  ECS_TASK_DEV: ecs-project-dev-task
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  
+  build:
+    name: Build and Push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    outputs:
+      image_tag: ${{ steps.vars.outputs.sha }}
+      image_uri: ${{ steps.build.outputs.image_uri }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set variables
+        id: vars
+        run: |
+          SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+          echo "sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        id: build
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.vars.outputs.sha }}
+        run: |
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          docker build -t ${IMAGE_URI} .
+          docker push ${IMAGE_URI}
+          echo "image_uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+
+  deploy-dev:
+    name: Deploy to Dev
+    needs: build
+    runs-on: ubuntu-latest
+    environment: dev
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update ECS task definition
+        id: update-task
+        env:
+          IMAGE_URI: ${{ needs.build.outputs.image_uri }}
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition ${{ env.ECS_TASK_DEV }} \
+            --query 'taskDefinition' \
+            --output json)
+          
+          NEW_TASK_DEF=$(echo $TASK_DEF | jq \
+            --arg IMAGE "${IMAGE_URI}" \
+            '.containerDefinitions[0].image = $IMAGE |
+             del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+          
+          NEW_TASK_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          
+          echo "task_arn=${NEW_TASK_ARN}" >> $GITHUB_OUTPUT
+
+      - name: Deploy to ECS
+        env:
+          TASK_ARN: ${{ steps.update-task.outputs.task_arn }}
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER_DEV }} \
+            --service ${{ env.ECS_SERVICE_DEV }} \
+            --task-definition ${TASK_ARN}
+          
+          aws ecs wait services-stable \
+            --cluster ${{ env.ECS_CLUSTER_DEV }} \
+            --services ${{ env.ECS_SERVICE_DEV }}

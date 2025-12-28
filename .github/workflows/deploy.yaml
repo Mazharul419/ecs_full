@@ -1,0 +1,130 @@
+name: Deploy to Environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+      image_tag:
+        description: 'Image tag (SHA) to deploy'
+        required: true
+        type: string
+      confirm_prod:
+        description: 'Type "deploy-prod" to confirm production deployment'
+        required: false
+        type: string
+
+env:
+  AWS_REGION: eu-west-2
+  ECR_REPOSITORY: ecs-project
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check prod confirmation
+        if: inputs.environment == 'prod' && inputs.confirm_prod != 'deploy-prod'
+        run: |
+          echo "❌ Production deployment requires confirmation."
+          echo "Please type 'deploy-prod' in the confirm_prod field."
+          exit 1
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify image exists
+        run: |
+          aws ecr describe-images \
+            --repository-name ${{ env.ECR_REPOSITORY }} \
+            --image-ids imageTag=${{ inputs.image_tag }} \
+            > /dev/null 2>&1 \
+            || (echo "❌ Image tag '${{ inputs.image_tag }}' not found in ECR" && exit 1)
+          
+          echo "✅ Image tag '${{ inputs.image_tag }}' exists"
+
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Set environment variables
+        id: env-vars
+        run: |
+          if [ "${{ inputs.environment }}" == "prod" ]; then
+            echo "cluster=ecs-project-prod-cluster" >> $GITHUB_OUTPUT
+            echo "service=ecs-project-prod-service" >> $GITHUB_OUTPUT
+            echo "task=ecs-project-prod-task" >> $GITHUB_OUTPUT
+            echo "url=https://tm.mazharulislam.dev" >> $GITHUB_OUTPUT
+          else
+            echo "cluster=ecs-project-dev-cluster" >> $GITHUB_OUTPUT
+            echo "service=ecs-project-dev-service" >> $GITHUB_OUTPUT
+            echo "task=ecs-project-dev-task" >> $GITHUB_OUTPUT
+            echo "url=https://tm-dev.mazharulislam.dev" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Update ECS task definition
+        id: update-task
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          TASK_NAME: ${{ steps.env-vars.outputs.task }}
+        run: |
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
+          
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition ${TASK_NAME} \
+            --query 'taskDefinition' \
+            --output json)
+          
+          NEW_TASK_DEF=$(echo $TASK_DEF | jq \
+            --arg IMAGE "${IMAGE_URI}" \
+            '.containerDefinitions[0].image = $IMAGE |
+             del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+          
+          NEW_TASK_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          
+          echo "task_arn=${NEW_TASK_ARN}" >> $GITHUB_OUTPUT
+
+      - name: Deploy to ECS
+        env:
+          CLUSTER: ${{ steps.env-vars.outputs.cluster }}
+          SERVICE: ${{ steps.env-vars.outputs.service }}
+          TASK_ARN: ${{ steps.update-task.outputs.task_arn }}
+        run: |
+          aws ecs update-service \
+            --cluster ${CLUSTER} \
+            --service ${SERVICE} \
+            --task-definition ${TASK_ARN}
+          
+          aws ecs wait services-stable \
+            --cluster ${CLUSTER} \
+            --services ${SERVICE}
