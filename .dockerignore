@@ -1,5 +1,5 @@
 Dockerfile
-
+.dockerignore
 .git
 .github
 infrastructure/
@@ -14,8 +14,6 @@ npm-debug.log
 .gitignore
 
 # Local build outputs
-app/.git/
-app/lib/vscode/.git/
 app/node_modules/
 app/out/
 app/dist/

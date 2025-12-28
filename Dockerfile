@@ -25,7 +25,7 @@ FROM gcr.io/distroless/base-debian12
 WORKDIR /app
 COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-gnu/
 COPY --from=builder /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/
-COPY --from=builder /usr/src/code-server/release-standalone/ ./
+COPY --from=builder /usr/src/code-server/release-standalone/ ./ 
 USER nonroot
 EXPOSE 80
 
