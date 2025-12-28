@@ -1,0 +1,37 @@
+Dockerfile
+
+.git
+.github
+infrastructure/
+*.md
+!app/
+
+# Node modules (will be installed inside container)
+node_modules
+npm-debug.log
+
+# Git metadata
+.gitignore
+
+# Local build outputs
+app/.git/
+app/lib/vscode/.git/
+app/node_modules/
+app/out/
+app/dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE/editor settings
+.vscode
+.idea
+
+# Logs, temp files
+*.log
+tmp/
+*.tmp
+
+# Environment files (if any)
+.env
