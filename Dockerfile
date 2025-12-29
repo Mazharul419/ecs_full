@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgcc1 \
     && rm -rf /var/lib/apt/lists/*
 COPY app/ .
+RUN git submodule update --init --recursive
 RUN npm install
 RUN npm run build
 RUN VERSION=1.105.1 npm run build:vscode
