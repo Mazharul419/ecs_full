@@ -7,7 +7,7 @@ infrastructure/
 !app/
 
 # Node modules (will be installed inside container)
-node_modules
+**/node_modules
 npm-debug.log
 
 # Git metadata
