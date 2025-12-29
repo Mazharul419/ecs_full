@@ -1,6 +1,6 @@
 # Stage 1: Build stage
 
-FROM node:22.19-bullseye AS builder
+FROM node:22.19-bookworm AS builder
 WORKDIR /usr/src/code-server
 COPY package*.json ./
 RUN npm install -g npm@11.6.2
