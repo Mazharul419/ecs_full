@@ -1,8 +1,7 @@
 # Stage 1: Build stage
 
 FROM node:22.21-bookworm AS builder
-WORKDIR /usr/src/code-server
-COPY package*.json ./
+WORKDIR /usr/src/
 RUN npm install -g npm@11.6.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential g++ python-is-python3 \
@@ -11,8 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rsync jq gnupg \
     libgcc1 \
     && rm -rf /var/lib/apt/lists/*
-COPY app/ .
-RUN git submodule update --init --recursive
+RUN git clone --recursive --depth 1 https://github.com/coder/code-server.git code-server
+WORKDIR /usr/src/code-server
 RUN npm install
 RUN npm run build
 RUN VERSION=1.105.1 npm run build:vscode
