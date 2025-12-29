@@ -1,6 +1,5 @@
 Dockerfile
 .dockerignore
-.git
 .github
 infrastructure/
 *.md
