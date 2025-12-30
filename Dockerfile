@@ -1,6 +1,6 @@
 # Stage 1: Build stage
 
-FROM node:22.21-bookworm AS builder
+FROM node:22.21-bullseye AS builder
 WORKDIR /usr/src/
 RUN npm install -g npm@11.6.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -14,7 +14,7 @@ RUN git clone --recursive --depth 1 https://github.com/coder/code-server.git cod
 WORKDIR /usr/src/code-server
 RUN npm install
 RUN npm run build
-RUN VERSION=1.105.1 npm run build:vscode
+RUN VERSION=4.107.0 npm run build:vscode
 RUN KEEP_MODULES=1 npm run release
 RUN npm run release:standalone
 RUN adduser nonroot && chown nonroot:nonroot ./
@@ -27,7 +27,7 @@ COPY --from=builder /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /lib/x86_64-linux-g
 COPY --from=builder /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/x86_64-linux-gnu/
 COPY --from=builder /usr/src/code-server/release-standalone/ ./ 
 USER nonroot
-EXPOSE 80
+EXPOSE 8080
 
 ENTRYPOINT ["/app/lib/node", "out/node/entry.js"]
-CMD ["--bind-addr", "0.0.0.0:80", "--auth", "none"]
+CMD ["--bind-addr", "0.0.0.0:8080", "--auth", "none"]

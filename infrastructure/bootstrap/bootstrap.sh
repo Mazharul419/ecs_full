@@ -4,6 +4,7 @@ set -e
 
 # Disable AWS CLI pager
 export AWS_PAGER=""
+export TG_NON_INTERACTIVE=true
 
 # ============================================================
 # COMPLETE BOOTSTRAP SCRIPT
@@ -220,207 +221,54 @@ else
 fi
 
 # ============================================================
-# STEP 3: CREATE OIDC PROVIDER AND ROLE
+# STEP 3: DEPLOY GITHUB OIDC WITH TERRAFORM
 # ============================================================
 
-print_step "STEP 3/9: Creating GitHub OIDC Provider and Role"
+print_step "STEP 3/9: Deploying GitHub OIDC Provider and Role"
 
-# Check if OIDC provider exists
-print_substep "Checking if OIDC provider exists..."
-OIDC_PROVIDER_ARN="arn:aws:iam::${ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com"
+cd "$INFRA_DIR/live/global/oidc"
 
-if aws iam get-open-id-connect-provider --open-id-connect-provider-arn "$OIDC_PROVIDER_ARN" &> /dev/null; then
-  print_success "OIDC provider already exists"
-else
-  print_substep "Creating OIDC provider..."
-  
-  aws iam create-open-id-connect-provider \
-    --url "https://token.actions.githubusercontent.com" \
-    --client-id-list "sts.amazonaws.com" \
-    --thumbprint-list "6938fd4d98bab03faadb97b34396831e3780aea1"
-  
-  print_success "OIDC provider created"
+print_substep "Initializing Terraform..."
+terragrunt init
+
+print_substep "Applying OIDC configuration..."
+terragrunt apply --auto-approve
+
+# Get outputs
+ROLE_ARN=$(terragrunt output -raw role_arn 2>/dev/null || echo "")
+
+if [ -z "$ROLE_ARN" ]; then
+  print_warning "Could not get role ARN from output, using constructed value"
+  ROLE_ARN="arn:aws:iam::${ACCOUNT_ID}:role/github-actions-role"
 fi
 
-# Check if role exists
-print_substep "Checking if IAM role exists..."
-ROLE_NAME="github-actions-role"
-
-if aws iam get-role --role-name "$ROLE_NAME" &> /dev/null; then
-  print_success "IAM role already exists"
-else
-  print_substep "Creating IAM role..."
-  
-  # Get GitHub org/repo from git remote (or use defaults)
-  GITHUB_ORG="Mazharul419"
-  GITHUB_REPO="ecs_full"
-  
-  # Try to get from git remote
-  if git remote get-url origin &> /dev/null; then
-    REMOTE_URL=$(git remote get-url origin)
-    if [[ "$REMOTE_URL" =~ github\.com[:/]([^/]+)/([^/.]+) ]]; then
-      GITHUB_ORG="${BASH_REMATCH[1]}"
-      GITHUB_REPO="${BASH_REMATCH[2]}"
-    fi
-  fi
-  
-  print_info "GitHub repo: $GITHUB_ORG/$GITHUB_REPO"
-  
-  # Create trust policy
-  TRUST_POLICY=$(cat <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Federated": "arn:aws:iam::${ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com"
-      },
-      "Action": "sts:AssumeRoleWithWebIdentity",
-      "Condition": {
-        "StringEquals": {
-          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
-        },
-        "StringLike": {
-          "token.actions.githubusercontent.com:sub": "repo:${GITHUB_ORG}/${GITHUB_REPO}:*"
-        }
-      }
-    }
-  ]
-}
-EOF
-)
-  
-  aws iam create-role \
-    --role-name "$ROLE_NAME" \
-    --assume-role-policy-document "$TRUST_POLICY" \
-    --description "Role for GitHub Actions CI/CD" \
-    --tags Key=Project,Value=$PROJECT_NAME Key=ManagedBy,Value=Bootstrap
-  
-  print_success "IAM role created"
-  
-  # Create permissions policy
-  print_substep "Attaching permissions policy..."
-  
-  PERMISSIONS_POLICY=$(cat <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "ECRAuth",
-      "Effect": "Allow",
-      "Action": [
-        "ecr:GetAuthorizationToken"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "ECRPush",
-      "Effect": "Allow",
-      "Action": [
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:BatchGetImage",
-        "ecr:PutImage",
-        "ecr:InitiateLayerUpload",
-        "ecr:UploadLayerPart",
-        "ecr:CompleteLayerUpload"
-      ],
-      "Resource": "arn:aws:ecr:${AWS_REGION}:${ACCOUNT_ID}:repository/${PROJECT_NAME}"
-    },
-    {
-      "Sid": "ECSTaskDefinition",
-      "Effect": "Allow",
-      "Action": [
-        "ecs:DescribeTaskDefinition",
-        "ecs:RegisterTaskDefinition"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "ECSService",
-      "Effect": "Allow",
-      "Action": [
-        "ecs:UpdateService",
-        "ecs:DescribeServices"
-      ],
-      "Resource": [
-        "arn:aws:ecs:${AWS_REGION}:${ACCOUNT_ID}:service/${PROJECT_NAME}-dev-cluster/${PROJECT_NAME}-dev-service",
-        "arn:aws:ecs:${AWS_REGION}:${ACCOUNT_ID}:service/${PROJECT_NAME}-prod-cluster/${PROJECT_NAME}-prod-service"
-      ]
-    },
-    {
-      "Sid": "PassRole",
-      "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": "arn:aws:iam::${ACCOUNT_ID}:role/${PROJECT_NAME}-*-ecs-execution-role"
-    }
-  ]
-}
-EOF
-)
-  
-  aws iam put-role-policy \
-    --role-name "$ROLE_NAME" \
-    --policy-name "github-actions-policy" \
-    --policy-document "$PERMISSIONS_POLICY"
-  
-  print_success "Permissions policy attached"
-fi
+print_success "OIDC provider and role created via Terraform"
+print_info "Role ARN: $ROLE_ARN"
 
 # ============================================================
 # STEP 4: CREATE ECR REPOSITORY
 # ============================================================
 
-print_step "STEP 4/9: Creating ECR Repository"
+print_step "STEP 5/9: Deploying ECR Repository with Terraform"
 
-print_substep "Checking if ECR repository exists..."
+cd "$INFRA_DIR/live/global/ecr"
 
-if aws ecr describe-repositories --repository-names "$PROJECT_NAME" --region "$AWS_REGION" &> /dev/null; then
-  print_success "ECR repository already exists"
-else
-  print_substep "Creating ECR repository..."
-  
-  aws ecr create-repository \
-    --repository-name "$PROJECT_NAME" \
-    --region "$AWS_REGION" \
-    --image-scanning-configuration scanOnPush=true \
-    --encryption-configuration encryptionType=AES256 \
-    --tags Key=Project,Value=$PROJECT_NAME Key=ManagedBy,Value=Bootstrap
-  
-  print_substep "Adding lifecycle policy (keep last 10 images)..."
-  
-  LIFECYCLE_POLICY=$(cat <<EOF
-{
-  "rules": [
-    {
-      "rulePriority": 1,
-      "description": "Keep last 10 images",
-      "selection": {
-        "tagStatus": "any",
-        "countType": "imageCountMoreThan",
-        "countNumber": 10
-      },
-      "action": {
-        "type": "expire"
-      }
-    }
-  ]
-}
-EOF
-)
-  
-  aws ecr put-lifecycle-policy \
-    --repository-name "$PROJECT_NAME" \
-    --region "$AWS_REGION" \
-    --lifecycle-policy-text "$LIFECYCLE_POLICY"
-  
-  print_success "ECR repository created"
+print_substep "Initializing Terraform..."
+terragrunt init
+
+print_substep "Applying ECR configuration..."
+terragrunt apply --auto-approve
+
+# Get ECR URL from Terraform output
+ECR_URL=$(terragrunt output -raw repository_url 2>/dev/null)
+
+if [ -z "$ECR_URL" ]; then
+  print_error "Failed to get ECR URL from Terraform output"
+  ECR_URL="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${PROJECT_NAME}"
+  print_warning "Using constructed URL: $ECR_URL"
 fi
 
-ECR_URL="${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${PROJECT_NAME}"
+print_success "ECR repository created via Terraform"
 print_info "ECR URL: $ECR_URL"
 
 # ============================================================
@@ -430,8 +278,8 @@ print_info "ECR URL: $ECR_URL"
 print_step "STEP 5/9: Building and Pushing Initial Docker Image"
 
 # Check if Dockerfile exists
-if [ ! -f "$REPO_DIR/app/Dockerfile" ]; then
-  print_error "Dockerfile not found at $REPO_DIR/app/Dockerfile"
+if [ ! -f "$REPO_DIR/Dockerfile" ]; then
+  print_error "Dockerfile not found at $REPO_DIR/Dockerfile"
   exit 1
 fi
 
@@ -439,7 +287,7 @@ print_substep "Logging into ECR..."
 aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_URL"
 
 print_substep "Building Docker image... - this will take minimum 30 minutes, and can go up to 1 hour depending on your specs"
-cd "$REPO_DIR/app"
+cd "$REPO_DIR"
 docker build -t "${PROJECT_NAME}:${INITIAL_TAG}" .
 
 print_substep "Tagging image..."
@@ -488,42 +336,42 @@ else
   print_info "Check manually: $DEV_URL"
 fi
 
-# ============================================================
-# STEP 8: DEPLOY PROD INFRASTRUCTURE
-# ============================================================
+# # ============================================================
+# # STEP 8: DEPLOY PROD INFRASTRUCTURE
+# # ============================================================
 
-print_step "STEP 8/9: Deploying Prod Infrastructure"
+# print_step "STEP 8/9: Deploying Prod Infrastructure"
 
-print_info "Estimated time: 10-15 minutes"
-echo ""
+# print_info "Estimated time: 10-15 minutes"
+# echo ""
 
-cd "$INFRA_DIR/live/prod"
+# cd "$INFRA_DIR/live/prod"
 
-print_substep "Running terragrunt run --all apply..."
-terragrunt run --all apply --non-interactive
+# print_substep "Running terragrunt run --all apply..."
+# terragrunt run --all apply --non-interactive
 
-print_success "Prod infrastructure deployed"
+# print_success "Prod infrastructure deployed"
 
-# ============================================================
-# STEP 9: VERIFY PROD DEPLOYMENT
-# ============================================================
+# # ============================================================
+# # STEP 9: VERIFY PROD DEPLOYMENT
+# # ============================================================
 
-print_step "STEP 9/9: Verifying Prod Deployment"
+# print_step "STEP 9/9: Verifying Prod Deployment"
 
-print_substep "Waiting 60 seconds for services to stabilize..."
-sleep 60
+# print_substep "Waiting 60 seconds for services to stabilize..."
+# sleep 60
 
-PROD_URL="https://tm.mazharulislam.dev"
+# PROD_URL="https://tm.mazharulislam.dev"
 
-print_substep "Testing $PROD_URL..."
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$PROD_URL" || echo "000")
+# print_substep "Testing $PROD_URL..."
+# HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$PROD_URL" || echo "000")
 
-if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ]; then
-  print_success "Prod is accessible (HTTP $HTTP_CODE): $PROD_URL"
-else
-  print_warning "Prod returned HTTP $HTTP_CODE - may still be starting"
-  print_info "Check manually: $PROD_URL"
-fi
+# if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ]; then
+#   print_success "Prod is accessible (HTTP $HTTP_CODE): $PROD_URL"
+# else
+#   print_warning "Prod returned HTTP $HTTP_CODE - may still be starting"
+#   print_info "Check manually: $PROD_URL"
+# fi
 
 # ============================================================
 # SUMMARY
