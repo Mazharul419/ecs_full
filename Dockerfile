@@ -1,6 +1,6 @@
 # Stage 1: Build stage
 
-FROM node:22.21-bullseye AS builder
+FROM node:22.21-bookworm AS builder
 WORKDIR /usr/src/
 RUN npm install -g npm@11.6.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -12,6 +12,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 RUN git clone --recursive --depth 1 https://github.com/coder/code-server.git code-server
 WORKDIR /usr/src/code-server
+RUN git submodule update --init
+RUN quilt push -a
 RUN npm install
 RUN npm run build
 RUN VERSION=4.107.0 npm run build:vscode

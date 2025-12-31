@@ -43,19 +43,19 @@ print_substep() {
 }
 
 print_success() {
-  echo -e "${GREEN}✅ $1${NC}"
+  echo -e "${GREEN} $1${NC}"
 }
 
 print_warning() {
-  echo -e "${YELLOW}⚠️  $1${NC}"
+  echo -e "${YELLOW}  $1${NC}"
 }
 
 print_error() {
-  echo -e "${RED}❌ $1${NC}"
+  echo -e "${RED} $1${NC}"
 }
 
 print_info() {
-  echo -e "${BLUE}ℹ️  $1${NC}"
+  echo -e "${BLUE}ℹ  $1${NC}"
 }
 
 # Get script directory (for relative paths)
@@ -336,42 +336,42 @@ else
   print_info "Check manually: $DEV_URL"
 fi
 
-# # ============================================================
-# # STEP 8: DEPLOY PROD INFRASTRUCTURE
-# # ============================================================
+# ============================================================
+# STEP 8: DEPLOY PROD INFRASTRUCTURE
+# ============================================================
 
-# print_step "STEP 8/9: Deploying Prod Infrastructure"
+print_step "STEP 8/9: Deploying Prod Infrastructure"
 
-# print_info "Estimated time: 10-15 minutes"
-# echo ""
+print_info "Estimated time: 10-15 minutes"
+echo ""
 
-# cd "$INFRA_DIR/live/prod"
+cd "$INFRA_DIR/live/prod"
 
-# print_substep "Running terragrunt run --all apply..."
-# terragrunt run --all apply --non-interactive
+print_substep "Running terragrunt run --all apply..."
+terragrunt run --all apply --non-interactive
 
-# print_success "Prod infrastructure deployed"
+print_success "Prod infrastructure deployed"
 
-# # ============================================================
-# # STEP 9: VERIFY PROD DEPLOYMENT
-# # ============================================================
+# ============================================================
+# STEP 9: VERIFY PROD DEPLOYMENT
+# ============================================================
 
-# print_step "STEP 9/9: Verifying Prod Deployment"
+print_step "STEP 9/9: Verifying Prod Deployment"
 
-# print_substep "Waiting 60 seconds for services to stabilize..."
-# sleep 60
+print_substep "Waiting 60 seconds for services to stabilize..."
+sleep 60
 
-# PROD_URL="https://tm.mazharulislam.dev"
+PROD_URL="https://tm.mazharulislam.dev"
 
-# print_substep "Testing $PROD_URL..."
-# HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$PROD_URL" || echo "000")
+print_substep "Testing $PROD_URL..."
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 "$PROD_URL" || echo "000")
 
-# if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ]; then
-#   print_success "Prod is accessible (HTTP $HTTP_CODE): $PROD_URL"
-# else
-#   print_warning "Prod returned HTTP $HTTP_CODE - may still be starting"
-#   print_info "Check manually: $PROD_URL"
-# fi
+if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ]; then
+  print_success "Prod is accessible (HTTP $HTTP_CODE): $PROD_URL"
+else
+  print_warning "Prod returned HTTP $HTTP_CODE - may still be starting"
+  print_info "Check manually: $PROD_URL"
+fi
 
 # ============================================================
 # SUMMARY
@@ -380,7 +380,7 @@ fi
 echo ""
 echo ""
 echo -e "${GREEN}============================================================${NC}"
-echo -e "${GREEN}🎉 BOOTSTRAP COMPLETE!${NC}"
+echo -e "${GREEN} BOOTSTRAP COMPLETE${NC}"
 echo -e "${GREEN}============================================================${NC}"
 echo ""
 echo -e "${BLUE}RESOURCES CREATED:${NC}"

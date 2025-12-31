@@ -32,6 +32,7 @@ print_error() {
 PROJECT_NAME="ecs-project"
 AWS_REGION="eu-west-2"
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+ECR_REPO_NAME="${PROJECT_NAME}-global-ecr"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 INFRA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -73,13 +74,13 @@ fi
 print_step "Destroying Infrastructure"
 
 DESTROY_ORDER=(
-  # "live/prod/dns"
-  # "live/prod/ecs"
-  # "live/prod/alb"
-  # "live/prod/acm"
-  # "live/prod/vpc-endpoints"
-  # "live/prod/security-groups"
-  # "live/prod/vpc"
+  "live/prod/dns"
+  "live/prod/ecs"
+  "live/prod/alb"
+  "live/prod/acm"
+  "live/prod/vpc-endpoints"
+  "live/prod/security-groups"
+  "live/prod/vpc"
   "live/dev/dns"
   "live/dev/ecs"
   "live/dev/alb"
@@ -87,8 +88,8 @@ DESTROY_ORDER=(
   "live/dev/vpc-endpoints"
   "live/dev/security-groups"
   "live/dev/vpc"
-  "global/ecr"
-  "global/oidc"
+  "live/global/ecr"
+  "live/global/oidc"
 )
 
 for module in "${DESTROY_ORDER[@]}"; do
@@ -151,25 +152,25 @@ fi
 
 # ECR Images
 print_substep "Checking for ECR repository..."
-if aws ecr describe-repositories --repository-names "$PROJECT_NAME" --region "$AWS_REGION" &> /dev/null; then
+if aws ecr describe-repositories --repository-names "$ECR_REPO_NAME" --region "$AWS_REGION" &> /dev/null; then
   print_substep "Deleting ECR images..."
   
   IMAGE_IDS=$(aws ecr list-images \
-    --repository-name "$PROJECT_NAME" \
+    --repository-name "$ECR_REPO_NAME" \
     --region "$AWS_REGION" \
     --query 'imageIds[*]' \
     --output json)
   
   if [ "$IMAGE_IDS" != "[]" ]; then
     aws ecr batch-delete-image \
-      --repository-name "$PROJECT_NAME" \
+      --repository-name "$ECR_REPO_NAME" \
       --region "$AWS_REGION" \
       --image-ids "$IMAGE_IDS" > /dev/null 2>&1 || true
   fi
   
   print_substep "Deleting ECR repository..."
   aws ecr delete-repository \
-    --repository-name "$PROJECT_NAME" \
+    --repository-name "$ECR_REPO_NAME" \
     --region "$AWS_REGION" \
     --force 2>/dev/null || true
   print_success "ECR deleted"
@@ -189,21 +190,17 @@ read -p "Delete bucket '$BUCKET_NAME'? (y/N): " DELETE_BUCKET
 if [ "$DELETE_BUCKET" = "y" ] || [ "$DELETE_BUCKET" = "Y" ]; then
   if aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
     
-    print_substep "Emptying bucket..."
-    aws s3 rm "s3://${BUCKET_NAME}" --recursive 2>/dev/null || true
+    print_substep "Deleting bucket and all contents..."
     
-    print_substep "Deleting object versions..."
-    aws s3api list-object-versions \
-      --bucket "$BUCKET_NAME" \
-      --output json \
-      --query 'Versions[].{Key:Key,VersionId:VersionId}' 2>/dev/null | \
-    jq -r '.[]? | "--key \"\(.Key)\" --version-id \"\(.VersionId)\""' | \
-    xargs -I {} aws s3api delete-object --bucket "$BUCKET_NAME" {} 2>/dev/null || true
+    # Force delete (handles versions, delete markers, everything)
+    aws s3 rb "s3://${BUCKET_NAME}" --force
     
-    print_substep "Deleting bucket..."
-    aws s3api delete-bucket --bucket "$BUCKET_NAME" --region "$AWS_REGION" 2>/dev/null || true
-    
-    print_success "S3 bucket deleted"
+    if [ $? -eq 0 ]; then
+      print_success "S3 bucket deleted"
+    else
+      print_error "Failed to delete bucket"
+      exit 1
+    fi
   else
     print_substep "Bucket not found or already deleted"
   fi
@@ -235,20 +232,20 @@ print_success "Local files cleaned"
 echo ""
 echo ""
 echo -e "${GREEN}============================================================${NC}"
-echo -e "${GREEN}🎉 TEARDOWN COMPLETE${NC}"
+echo -e "${GREEN} TEARDOWN COMPLETE${NC}"
 echo -e "${GREEN}============================================================${NC}"
 echo ""
 echo -e "${BLUE}RESOURCES DESTROYED:${NC}"
 echo ""
-echo "✅ Prod environment"
-echo "✅ Dev environment"
-echo "✅ ECR repository"
-echo "✅ OIDC provider and role"
+echo "Prod environment"
+echo "Dev environment"
+echo "ECR repository"
+echo "OIDC provider and role"
 
 if [ "$DELETE_BUCKET" = "y" ] || [ "$DELETE_BUCKET" = "Y" ]; then
-  echo "✅ S3 state bucket"
+  echo "S3 state bucket"
 else
-  echo "⏭️  S3 state bucket (preserved)"
+  echo "S3 state bucket (preserved)"
 fi
 
 echo ""
