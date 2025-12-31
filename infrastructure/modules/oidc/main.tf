@@ -36,3 +36,69 @@ resource "aws_iam_role" "github_actions" {
     Name = "github-actions-role"
   }
 }
+
+resource "aws_iam_role_policy" "github_actions_ecr" {
+  name = "github-actions-ecr-policy"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ]
+        Resource = "arn:aws:ecr:${var.aws_region}:${data.aws_caller_identity.current.account_id}:repository/${var.project_name}-*"
+      }
+    ]
+  })
+}
+
+# ECS Deploy Policy (if you also deploy from GitHub Actions)
+resource "aws_iam_role_policy" "github_actions_ecs" {
+  name = "github-actions-ecs-policy"
+  role = aws_iam_role.github_actions.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:UpdateService",
+          "ecs:DescribeServices",
+          "ecs:DescribeTaskDefinition",
+          "ecs:RegisterTaskDefinition"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:PassRole"
+        ]
+        Resource = [
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*-ecs-execution",
+          "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/*-ecs-task"
+        ]
+      }
+    ]
+  })
+}
+
+# Data source for account ID
+data "aws_caller_identity" "current" {}
