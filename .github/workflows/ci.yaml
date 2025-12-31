@@ -8,7 +8,7 @@ on:
 
 env:
   AWS_REGION: eu-west-2
-  ECR_REPOSITORY: ecs-project
+  ECR_REPOSITORY: ecs-project-global-ecr
   ECS_CLUSTER_DEV: ecs-project-dev-cluster
   ECS_SERVICE_DEV: ecs-project-dev-service
   ECS_TASK_DEV: ecs-project-dev-task
