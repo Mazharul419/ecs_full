@@ -10,7 +10,7 @@ env:
   AWS_REGION: eu-west-2
   ECR_REPOSITORY: ecs-project-global-ecr
   ECS_CLUSTER_DEV: ecs-project-dev-cluster
-  ECS_SERVICE_DEV: ecs-project-dev-service
+  ECS_SERVICE_DEV: ecs-project-dev-ecs-service
   ECS_TASK_DEV: ecs-project-dev-task
 
 permissions:
@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 0          # full clone
+          fetch-depth: 0
 
       - name: Set variables
         id: vars
@@ -61,13 +61,13 @@ jobs:
           docker build -t ${IMAGE_URI} .
           echo "image_uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
 
-      - name: Login to ECR (refresh token)  # ← Fixed typo (space after dash)
+      - name: Login to ECR (refresh token)
         id: login-ecr-push
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Push image to ECR
         env:
-          IMAGE_URI: ${{ steps.build.outputs.image_uri }}  # ← Get from build step
+          IMAGE_URI: ${{ steps.build.outputs.image_uri }}
         run: |
           docker push ${IMAGE_URI}
           echo "Pushed: ${IMAGE_URI}"
@@ -91,32 +91,67 @@ jobs:
         env:
           IMAGE_URI: ${{ needs.build.outputs.image_uri }}
         run: |
-          TASK_DEF=$(aws ecs describe-task-definition \
+          echo "Fetching task definition for: ${{ env.ECS_TASK_DEV }}"
+          
+          # Save task definition to file
+          aws ecs describe-task-definition \
             --task-definition ${{ env.ECS_TASK_DEV }} \
-            --query 'taskDefinition' \
-            --output json)
+            --region ${{ env.AWS_REGION }} \
+            --query 'taskDefinition' > task-def.json
           
-          NEW_TASK_DEF=$(echo $TASK_DEF | jq \
-            --arg IMAGE "${IMAGE_URI}" \
+          echo "Updating image to: ${IMAGE_URI}"
+          
+          # Update the image and remove unnecessary fields
+          jq --arg IMAGE "${IMAGE_URI}" \
             '.containerDefinitions[0].image = $IMAGE |
-             del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+             del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            task-def.json > new-task-def.json
           
+          # Verify the image was set
+          NEW_IMAGE=$(jq -r '.containerDefinitions[0].image' new-task-def.json)
+          echo "Verified new image: ${NEW_IMAGE}"
+          
+          if [ -z "$NEW_IMAGE" ] || [ "$NEW_IMAGE" == "null" ]; then
+            echo "ERROR: Image not set in task definition!"
+            cat new-task-def.json
+            exit 1
+          fi
+          
+          # Register new task definition
+          echo "Registering new task definition..."
           NEW_TASK_ARN=$(aws ecs register-task-definition \
-            --cli-input-json "$NEW_TASK_DEF" \
+            --cli-input-json file://new-task-def.json \
+            --region ${{ env.AWS_REGION }} \
             --query 'taskDefinition.taskDefinitionArn' \
             --output text)
           
+          if [ -z "$NEW_TASK_ARN" ]; then
+            echo "ERROR: Failed to register task definition"
+            exit 1
+          fi
+          
+          echo "Registered: ${NEW_TASK_ARN}"
           echo "task_arn=${NEW_TASK_ARN}" >> $GITHUB_OUTPUT
 
       - name: Deploy to ECS
         env:
           TASK_ARN: ${{ steps.update-task.outputs.task_arn }}
         run: |
+          echo "Updating ECS service..."
+          echo "  Cluster: ${{ env.ECS_CLUSTER_DEV }}"
+          echo "  Service: ${{ env.ECS_SERVICE_DEV }}"
+          echo "  Task: ${TASK_ARN}"
+          
           aws ecs update-service \
             --cluster ${{ env.ECS_CLUSTER_DEV }} \
             --service ${{ env.ECS_SERVICE_DEV }} \
-            --task-definition ${TASK_ARN}
+            --task-definition ${TASK_ARN} \
+            --region ${{ env.AWS_REGION }}
           
+          echo "Waiting for service to stabilize..."
           aws ecs wait services-stable \
             --cluster ${{ env.ECS_CLUSTER_DEV }} \
-            --services ${{ env.ECS_SERVICE_DEV }}
+            --services ${{ env.ECS_SERVICE_DEV }} \
+            --region ${{ env.AWS_REGION }}
+          
+          echo "Deployment complete"
