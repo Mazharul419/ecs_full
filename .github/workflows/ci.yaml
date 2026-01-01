@@ -50,16 +50,28 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push image
+      - name: Build image
         id: build
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ecs-project-global-ecr
           IMAGE_TAG: ${{ steps.vars.outputs.sha }}
         run: |
           IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}"
           docker build -t ${IMAGE_URI} .
-          docker push ${IMAGE_URI}
           echo "image_uri=${IMAGE_URI}" >> $GITHUB_OUTPUT
+
+      - name: Login to ECR (refresh token)  # ← Fixed typo (space after dash)
+        id: login-ecr-push
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Push image to ECR
+        env:
+          IMAGE_URI: ${{ steps.build.outputs.image_uri }}  # ← Get from build step
+        run: |
+          docker push ${IMAGE_URI}
+          echo "Pushed: ${IMAGE_URI}"
+    
 
   deploy-dev:
     name: Deploy to Dev

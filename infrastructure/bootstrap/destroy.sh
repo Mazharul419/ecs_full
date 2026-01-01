@@ -192,9 +192,30 @@ if [ "$DELETE_BUCKET" = "y" ] || [ "$DELETE_BUCKET" = "Y" ]; then
     
     print_substep "Deleting bucket and all contents..."
     
-    # Force delete (handles versions, delete markers, everything)
-    aws s3 rb "s3://${BUCKET_NAME}" --force
+    # Force delete (delete via python to handle versioned objects)
+python3 - <<EOF
+import boto3
+import sys
+
+bucket_name = "$BUCKET_NAME"
+region = "$AWS_REGION"
+
+try:
+    s3 = boto3.resource('s3', region_name=region)
+    bucket = s3.Bucket(bucket_name)
     
+    print(f"Deleting all object versions from {bucket_name}...")
+    bucket.object_versions.delete()
+    
+    print(f"Deleting bucket {bucket_name}...")
+    bucket.delete()
+    
+    print("✅ Bucket deleted successfully")
+except Exception as e:
+    print(f"❌ Error: {e}", file=sys.stderr)
+    sys.exit(1)
+EOF
+
     if [ $? -eq 0 ]; then
       print_success "S3 bucket deleted"
     else
