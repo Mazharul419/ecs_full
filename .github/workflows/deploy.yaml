@@ -21,7 +21,7 @@ on:
 
 env:
   AWS_REGION: eu-west-2
-  ECR_REPOSITORY: ecs-project
+  ECR_REPOSITORY: ecs-project-global-ecr
 
 permissions:
   id-token: write
