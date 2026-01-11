@@ -36,7 +36,7 @@ jobs:
       - name: Check prod confirmation
         if: inputs.environment == 'prod' && inputs.confirm_prod != 'deploy-prod'
         run: |
-          echo "❌ Production deployment requires confirmation."
+          echo "Production deployment requires confirmation."
           echo "Please type 'deploy-prod' in the confirm_prod field."
           exit 1
 
@@ -52,9 +52,9 @@ jobs:
             --repository-name ${{ env.ECR_REPOSITORY }} \
             --image-ids imageTag=${{ inputs.image_tag }} \
             > /dev/null 2>&1 \
-            || (echo "❌ Image tag '${{ inputs.image_tag }}' not found in ECR" && exit 1)
+            || (echo "Image tag '${{ inputs.image_tag }}' not found in ECR" && exit 1)
           
-          echo "✅ Image tag '${{ inputs.image_tag }}' exists"
+          echo "Image tag '${{ inputs.image_tag }}' exists"
 
   deploy:
     name: Deploy to ${{ inputs.environment }}
