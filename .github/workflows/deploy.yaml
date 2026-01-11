@@ -68,12 +68,12 @@ jobs:
         run: |
           if [ "${{ inputs.environment }}" == "prod" ]; then
             echo "cluster=ecs-project-prod-cluster" >> $GITHUB_OUTPUT
-            echo "service=ecs-project-prod-service" >> $GITHUB_OUTPUT
+            echo "service=ecs-project-prod-ecs-service" >> $GITHUB_OUTPUT
             echo "task=ecs-project-prod-task" >> $GITHUB_OUTPUT
             echo "url=https://tm.mazharulislam.dev" >> $GITHUB_OUTPUT
           else
             echo "cluster=ecs-project-dev-cluster" >> $GITHUB_OUTPUT
-            echo "service=ecs-project-dev-service" >> $GITHUB_OUTPUT
+            echo "service=ecs-project-dev-ecs-service" >> $GITHUB_OUTPUT
             echo "task=ecs-project-dev-task" >> $GITHUB_OUTPUT
             echo "url=https://tm-dev.mazharulislam.dev" >> $GITHUB_OUTPUT
           fi
