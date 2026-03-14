@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-
 # Disable AWS CLI pager
 export AWS_PAGER=""
 export TG_NON_INTERACTIVE=true
