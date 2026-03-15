@@ -66,9 +66,9 @@ jobs:
         id: set-dir
         run: |
           if [ "${{ inputs.environment }}" == "all" ]; then
-            echo "dir=live" >> $GITHUB_OUTPUT
+            echo "dir=infrastructure/live" >> $GITHUB_OUTPUT
           else
-            echo "dir=live/${{ inputs.environment }}" >> $GITHUB_OUTPUT
+            echo "dir=infrastructure/live/${{ inputs.environment }}" >> $GITHUB_OUTPUT
           fi
 
       - name: Print working directory
@@ -76,21 +76,23 @@ jobs:
 
       - name: Terragrunt Plan
         if: inputs.action == 'plan'
-        uses: gruntwork-io/terragrunt-action@v2
+        uses: gruntwork-io/terragrunt-action@v3
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
-          tg_dir: infrastructure/${{ steps.set-dir.outputs.dir }}
-          tg_command: 'run-all plan'
+          tg_dir: ${{ steps.set-dir.outputs.dir }}
+          run: |
+            terragrunt run --all plan --terragrunt-non-interactive
 
       - name: Terragrunt Apply
         if: inputs.action == 'apply'
-        uses: gruntwork-io/terragrunt-action@v2
+        uses: gruntwork-io/terragrunt-action@v3
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
-          tg_dir: infrastructure/${{ steps.set-dir.outputs.dir }}
-          tg_command: 'run-all apply --terragrunt-non-interactive'
+          tg_dir: ${{ steps.set-dir.outputs.dir }}
+          run: |
+            terragrunt run --all apply --terragrunt-non-interactive
 
       - name: Summary
         if: always()
