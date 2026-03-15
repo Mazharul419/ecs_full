@@ -76,6 +76,7 @@ jobs:
       
       - name: Create common.hcl
         run: |
+          mkdir -p $GITHUB_WORKSPACE/infrastructure/live/_env
           cat > $GITHUB_WORKSPACE/infrastructure/live/_env/common.hcl <<EOF
           locals {
             container_port     = 8080
