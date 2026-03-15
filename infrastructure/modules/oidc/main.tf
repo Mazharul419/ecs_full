@@ -127,6 +127,7 @@ resource "aws_iam_role_policy" "github_actions_ecs" {
   })
 }
 
+# Terragunt deploy Policy (permissions for running terragrunt apply and destroy)
 
 resource "aws_iam_role_policy" "github_actions_terragrunt" {
   name = "github-actions-terragrunt-policy"
