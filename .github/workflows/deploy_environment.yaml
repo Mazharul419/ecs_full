@@ -71,6 +71,9 @@ jobs:
             echo "dir=live/${{ inputs.environment }}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Print working directory
+        run: echo $GITHUB_WORKSPACE
+
       - name: Terragrunt Plan
         if: inputs.action == 'plan'
         uses: gruntwork-io/terragrunt-action@v2
