@@ -76,23 +76,23 @@ jobs:
 
       - name: Terragrunt Plan
         if: inputs.action == 'plan'
-        uses: gruntwork-io/terragrunt-action@v3
+        uses: gruntwork-io/terragrunt-action@v2
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
           tg_dir: ${{ steps.set-dir.outputs.dir }}
-          run: |
-            terragrunt run --all plan --terragrunt-non-interactive
+          tg_command: 'run-all plan'
+          tg_cli_args: '--terragrunt-non-interactive'
 
       - name: Terragrunt Apply
         if: inputs.action == 'apply'
-        uses: gruntwork-io/terragrunt-action@v3
+        uses: gruntwork-io/terragrunt-action@v2
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
           tg_dir: ${{ steps.set-dir.outputs.dir }}
-          run: |
-            terragrunt run --all apply --terragrunt-non-interactive
+          tg_command: 'run-all apply'
+          tg_cli_args: '--terragrunt-non-interactive'
 
       - name: Summary
         if: always()
