@@ -27,6 +27,7 @@ env:
   AWS_REGION: eu-west-2
   TERRAGRUNT_VERSION: 0.93.13
   TERRAFORM_VERSION: 1.14.1
+  ASDF_TERRAGRUNT_SKIP_CHECKSUM: "true"
 
 permissions:
   id-token: write
