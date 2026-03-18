@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# Disable AWS CLI pager
+# Disable AWS CLI pager + Run non-interactively
 export AWS_PAGER=""
 export TG_NON_INTERACTIVE=true
 
 # ============================================================
 # COMPLETE BOOTSTRAP SCRIPT
-# Creates: S3 (state) → OIDC → ECR → Dev → Prod
+# Creates: S3 (state) + OIDC + ECR
 # ============================================================
 
 PROJECT_NAME="ecs-project"
@@ -20,10 +20,10 @@ INFRA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 REPO_DIR="$(cd "$INFRA_DIR/.." && pwd)"
 
 # ============================================================
-# STEP 1: PRE-FLIGHT CHECKS
+# STEP 1: Checks
 # ============================================================
 
-echo "STEP 1/9: Pre-flight Checks"
+echo "STEP 1/5: Checks"
 
 # Check AWS CLI
 echo "Checking AWS CLI..."
@@ -116,10 +116,10 @@ echo ""
 echo "All pre-flight checks passed!"
 
 # ============================================================
-# STEP 2: CREATE S3 BUCKET FOR TERRAFORM STATE
+# STEP 2: Create S3 Bucket for Terraform State
 # ============================================================
 
-echo "STEP 2/9: Creating S3 Bucket for Terraform State"
+echo "STEP 2/5: Creating S3 Bucket for Terraform State"
 
 BUCKET_NAME="${PROJECT_NAME}-terraform-state-${ACCOUNT_ID}-${AWS_REGION}"
 
@@ -177,10 +177,10 @@ else
 fi
 
 # ============================================================
-# STEP 3: DEPLOY GITHUB OIDC WITH TERRAFORM
+# STEP 3: Deploy Github Actions OIDC role with Terraform
 # ============================================================
 
-echo "STEP 3/9: Deploying GitHub OIDC Provider and Role"
+echo "STEP 3/5: Deploying GitHub OIDC Provider and Role"
 
 cd "$INFRA_DIR/live/global/oidc"
 
@@ -202,10 +202,10 @@ echo "OIDC provider and role created via Terraform"
 echo "Role ARN: $ROLE_ARN"
 
 # ============================================================
-# STEP 4: CREATE ECR REPOSITORY
+# STEP 4: Create ECR Repo with Terraform
 # ============================================================
 
-echo "STEP 5/9: Deploying ECR Repository with Terraform"
+echo "STEP 4/5: Deploying ECR Repository with Terraform"
 
 cd "$INFRA_DIR/live/global/ecr"
 
@@ -228,10 +228,10 @@ echo "ECR repository created via Terraform"
 echo "ECR URL: $ECR_URL"
 
 # ============================================================
-# STEP 5: BUILD AND PUSH INITIAL DOCKER IMAGE
+# STEP 5: Build and Push Initial Docker Image to ECR
 # ============================================================
 
-echo "STEP 5/9: Building and Pushing Initial Docker Image"
+echo "STEP 5/5: Building and Pushing Initial Docker Image"
 
 # Check if Dockerfile exists
 if [ ! -f "$REPO_DIR/Dockerfile" ]; then

@@ -276,7 +276,10 @@ resource "aws_iam_role_policy" "github_actions_terragrunt" {
 				"ec2:CreateVpcEndpoint",
 				"ec2:DeleteVpcEndpoints"
 			],
-			"Resource": "arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:vpc-endpoint/*"
+			"Resource": [
+				"arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:route-table/*",
+				"arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:subnet/*"
+			]
 		},
 		{
 			"Effect": "Allow",
@@ -350,6 +353,14 @@ resource "aws_iam_role_policy" "github_actions_terragrunt" {
 				"elasticloadbalancing:ModifyLoadBalancerAttributes"
 			],
 			"Resource": "arn:aws:elasticloadbalancing:${var.aws_region}:${data.aws_caller_identity.current.account_id}:loadbalancer/*"
+		},
+				{
+			"Effect": "Allow",
+			"Action": "elasticloadbalancing:AddTags",
+			"Resource": [
+				"arn:aws:elasticloadbalancing:${var.aws_region}:${data.aws_caller_identity.current.account_id}:targetgroup/*",
+				"arn:aws:elasticloadbalancing:${var.aws_region}:${data.aws_caller_identity.current.account_id}:listener/*"
+			]
 		},
 		{
 			"Effect": "Allow",
