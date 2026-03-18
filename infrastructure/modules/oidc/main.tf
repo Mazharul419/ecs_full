@@ -278,7 +278,8 @@ resource "aws_iam_role_policy" "github_actions_terragrunt" {
 			],
 			"Resource": [
 				"arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:route-table/*",
-				"arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:subnet/*"
+				"arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:subnet/*",
+				"arn:aws:ec2:${var.aws_region}:${data.aws_caller_identity.current.account_id}:vpc-endpoint/*"
 			]
 		},
 		{
