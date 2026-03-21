@@ -74,7 +74,7 @@ jobs:
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
-          tg_dir: ${GITHUB_WORKSPACE}/infrastructure/live/dev
+          tg_dir: /infrastructure/live/dev
           tg_command: 'run --all destroy'
           tg_cli_args: '--non-interactive'
 
