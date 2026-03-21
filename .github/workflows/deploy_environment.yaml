@@ -94,7 +94,7 @@ jobs:
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
           tg_dir: ${{ steps.set-dir.outputs.dir }}
           tg_command: run --all plan --filter '!./global'
-          tg_cli_args: --non-interactive
+          tg_cli_args: --non-interactive --experiment=filter-flag
 
       - name: Terragrunt Apply
         if: inputs.action == 'apply'
@@ -104,7 +104,7 @@ jobs:
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
           tg_dir: ${{ steps.set-dir.outputs.dir }}
           tg_command: run --all apply --filter '!./global'
-          tg_cli_args: --non-interactive
+          tg_cli_args: --non-interactive --experiment=filter-flag
 
       - name: Summary
         if: always()
