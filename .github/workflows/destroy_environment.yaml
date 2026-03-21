@@ -86,8 +86,8 @@ jobs:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
           tg_dir: ${{ steps.set-dir.outputs.dir }}
-          tg_command: 'run --all destroy'
-          tg_cli_args: --non-interactive --filter '!./global'
+          tg_command: run --all destroy --filter '!./global'
+          tg_cli_args: --non-interactive 
 
       - name: Summary
         if: always()
