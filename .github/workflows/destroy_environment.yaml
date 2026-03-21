@@ -40,10 +40,11 @@ jobs:
           echo "Please type 'confirm-destroy' in the confirm_destroy field."
           exit 1
 
-  terragrunt:
-    name: Terragrunt Destroy - ${{ inputs.environment }}
+  dev:
+    name: dev
     needs: validate
     runs-on: ubuntu-latest
+    if: inputs.environment == 'dev' || inputs.environment == 'all'
     
     steps:
       - name: Checkout code
@@ -55,18 +56,6 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
           aws-region: ${{ env.AWS_REGION }}
           role-duration-seconds: 3600
-
-      - name: Set working directory
-        id: set-dir
-        run: |
-          if [ "${{ inputs.environment }}" == "all" ]; then
-            echo "dir=$GITHUB_WORKSPACE/infrastructure/live" >> $GITHUB_OUTPUT
-          else
-            echo "dir=$GITHUB_WORKSPACE/infrastructure/live/${{ inputs.environment }}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Print working directory
-        run: echo ${{ steps.set-dir.outputs.dir }}
       
       - name: Create common.hcl
         run: |
@@ -85,16 +74,64 @@ jobs:
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
-          tg_dir: ${{ steps.set-dir.outputs.dir }}
-          tg_command: run --all destroy --queue-exclude-dir "${{ steps.set-dir.outputs.dir }}/global"
-          tg_cli_args: --non-interactive
+          tg_dir: ${GITHUB_WORKSPACE}/infrastructure/live/dev
+          tg_command: 'run --all destroy'
+          tg_cli_args: '--non-interactive'
 
       - name: Summary
         if: always()
         run: |
-          echo "### Terragrunt ${{ inputs.action }} Complete" >> $GITHUB_STEP_SUMMARY
+          echo "### Terragrunt ${{ inputs.action }} ${{ inputs.environment }} Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Action**: ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment**: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Directory**: ${{ steps.set-dir.outputs.dir }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Directory**: ${GITHUB_WORKSPACE}/infrastructure/live/dev" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+  
+  prod:
+    name: prod
+    needs: validate
+    runs-on: ubuntu-latest
+    if: inputs.environment == 'prod' || inputs.environment == 'all'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 3600
+      
+      - name: Create common.hcl
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/infrastructure/live/_env
+          cat > $GITHUB_WORKSPACE/infrastructure/live/_env/common.hcl <<EOF
+          locals {
+            container_port     = 8080
+            domain_name        = "mazharulislam.dev"
+            cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          }
+          EOF
+
+      - name: Terragrunt Destroy
+        if: inputs.action == 'destroy'
+        uses: gruntwork-io/terragrunt-action@v2
+        with:
+          tf_version: ${{ env.TERRAFORM_VERSION }}
+          tg_version: ${{ env.TERRAGRUNT_VERSION }}
+          tg_dir: ${GITHUB_WORKSPACE}/infrastructure/live/prod
+          tg_command: 'run --all destroy'
+          tg_cli_args: '--non-interactive'
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Terragrunt ${{ inputs.action }} ${{ inputs.environment }} Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Action**: ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Directory**: ${GITHUB_WORKSPACE}/infrastructure/live/prod" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY

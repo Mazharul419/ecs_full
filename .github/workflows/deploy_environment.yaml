@@ -47,10 +47,11 @@ jobs:
           echo "Please type 'confirm-apply' in the confirm_apply field."
           exit 1
 
-  terragrunt:
-    name: Terragrunt ${{ inputs.action }} - ${{ inputs.environment }}
+  Dev:
+    name: Dev
     needs: validate
     runs-on: ubuntu-latest
+    if: inputs.environment == 'dev' || inputs.environment == 'all'
     
     steps:
       - name: Checkout code
@@ -62,15 +63,6 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
           aws-region: ${{ env.AWS_REGION }}
           role-duration-seconds: 3600
-
-      - name: Set working directory
-        id: set-dir
-        run: |
-          if [ "${{ inputs.environment }}" == "all" ]; then
-            echo "dir=$GITHUB_WORKSPACE/infrastructure/live" >> $GITHUB_OUTPUT
-          else
-            echo "dir=$GITHUB_WORKSPACE/infrastructure/live/${{ inputs.environment }}" >> $GITHUB_OUTPUT
-          fi
 
       - name: Print working directory
         run: echo ${{ steps.set-dir.outputs.dir }}
@@ -86,32 +78,93 @@ jobs:
           }
           EOF
 
-      - name: Terragrunt Plan
+      - name: Terragrunt Plan Dev
         if: inputs.action == 'plan'
         uses: gruntwork-io/terragrunt-action@v2
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
-          tg_dir: ${{ steps.set-dir.outputs.dir }}
-          tg_command: run --all plan --queue-exclude-dir "${{ steps.set-dir.outputs.dir }}/global"
+          tg_dir: $GITHUB_WORKSPACE/infrastructure/live/dev
+          tg_command: run --all plan
           tg_cli_args: --non-interactive
 
-      - name: Terragrunt Apply
+      - name: Terragrunt Apply Dev
         if: inputs.action == 'apply'
         uses: gruntwork-io/terragrunt-action@v2
         with:
           tf_version: ${{ env.TERRAFORM_VERSION }}
           tg_version: ${{ env.TERRAGRUNT_VERSION }}
-          tg_dir: ${{ steps.set-dir.outputs.dir }}
-          tg_command: run --all apply --queue-exclude-dir "${{ steps.set-dir.outputs.dir }}/global"
+          tg_dir: $GITHUB_WORKSPACE/infrastructure/live/dev
+          tg_command: run --all apply
           tg_cli_args: --non-interactive
 
-      - name: Summary
+      - name: Dev Summary
         if: always()
         run: |
-          echo "### Terragrunt ${{ inputs.action }} Complete" >> $GITHUB_STEP_SUMMARY
+          echo "### Terragrunt ${{ inputs.action }} ${{ inputs.environment }} Complete" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Action**: ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Environment**: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Directory**: ${{ steps.set-dir.outputs.dir }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Directory**: $GITHUB_WORKSPACE/infrastructure/live/dev" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+
+  Prod:
+    name: Prod
+    needs: validate
+    runs-on: ubuntu-latest
+    if: inputs.environment == 'prod' || inputs.environment == 'all'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-role
+          aws-region: ${{ env.AWS_REGION }}
+          role-duration-seconds: 3600
+
+      - name: Print working directory
+        run: echo ${{ steps.set-dir.outputs.dir }}
+      
+      - name: Create common.hcl
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/infrastructure/live/_env
+          cat > $GITHUB_WORKSPACE/infrastructure/live/_env/common.hcl <<EOF
+          locals {
+            container_port     = 8080
+            domain_name        = "mazharulislam.dev"
+            cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          }
+          EOF
+
+      - name: Terragrunt Plan Prod
+        if: inputs.action == 'plan'
+        uses: gruntwork-io/terragrunt-action@v2
+        with:
+          tf_version: ${{ env.TERRAFORM_VERSION }}
+          tg_version: ${{ env.TERRAGRUNT_VERSION }}
+          tg_dir: $GITHUB_WORKSPACE/infrastructure/live/prod
+          tg_command: run --all plan
+          tg_cli_args: --non-interactive
+
+      - name: Terragrunt Apply Prod
+        if: inputs.action == 'apply'
+        uses: gruntwork-io/terragrunt-action@v2
+        with:
+          tf_version: ${{ env.TERRAFORM_VERSION }}
+          tg_version: ${{ env.TERRAGRUNT_VERSION }}
+          tg_dir: $GITHUB_WORKSPACE/infrastructure/live/dev
+          tg_command: run --all apply
+          tg_cli_args: --non-interactive
+
+      - name: Prod Summary
+        if: always()
+        run: |
+          echo "### Terragrunt ${{ inputs.action }} ${{ inputs.environment }} Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Action**: ${{ inputs.action }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Directory**: $GITHUB_WORKSPACE/infrastructure/live/prod" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
