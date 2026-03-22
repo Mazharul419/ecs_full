@@ -98,6 +98,8 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
 * [![Terragrunt][Terragrunt.io]][Terragrunt-url]
 * [![Bash][Bash]][Bash-url]
 * [![Python][Python]][Python-url]
+* [![YAML][YAML]][YAML-url]
+* [![Docker][Docker]][Docker-url]
 * [![][]][-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -239,9 +241,9 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [linkedin-url]: https://linkedin.com/in/mazharul419
 [product-screenshot]: images/screenshot.png
 <!-- Shields.io badges. You can a comprehensive list with many more badges at: https://github.com/inttter/md-badges -->
-[Terraform.io]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
+[Terraform.io]: https://img.shields.io/badge/Terraform-844FBA?style=for-the-badge&logo=terraform&logoColor=fff
 [Terraform-url]: https://developer.hashicorp.com/terraform
-[Terragrunt.io]: https://img.shields.io/badge/Terragrunt-7B42BC?style=for-the-badge&logo=terraform&logoColor=white
+[Terragrunt.io]: https://img.shields.io/badge/Terragrunt-DDE072?style=for-the-badge&logo=terraform&logoColor=black
 [Terragrunt-url]: https://terragrunt.com/
 [Python]: https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white
 [Python-url]: https://www.python.org/
@@ -249,9 +251,9 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [Bash-url]: https://www.gnu.org/software/bash/
 [HCL]: https://img.shields.io/badge/HCL-006BB6?style=for-the-badge&logo=hcl&logoColor=white 
 [HCL-url]: https://developer.hashicorp.com/terraform/language
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
+[YAML]: https://img.shields.io/badge/YAML-CB171E?style=for-the-badge&logo=yaml&logoColor=fff
+[YAML-url]: https://yaml.org/
+[Docker]: https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=fff
+[Docker-url]: https://getbootstrap.com
 [JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
 [JQuery-url]: https://jquery.com 
