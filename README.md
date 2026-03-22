@@ -32,7 +32,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Mazharul419/ECS-Forge">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="<img width="517" height="480" alt="image" src="https://github.com/user-attachments/assets/6eb39472-28d0-420e-a7c1-93cea094fc1c" />
   </a>
 
 <h3 align="center">ECS-Forge</h3>
