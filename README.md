@@ -94,9 +94,9 @@ The application is hosted on AWS - hidden behind an application load balancer.
 * 35% Cost reduction through use of VPC endpoints vs NAT Gateways
 * Enhanced security posture using short-lived OIDC credentials
 * App protected via intelligent routing through Application Load Balancer (ALB)
-* 95% in Docker image size through multi-stage builds
+* 95% in Docker image size reduction through multi-stage builds
 * Adherence to Don't-Repeat-Yourself (DRY) principle through Terragrunt deployment
-* Secured remote state through S3 native locking
+* Secure remote state through S3 native locking
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
