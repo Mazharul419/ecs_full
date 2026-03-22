@@ -34,8 +34,10 @@
 <br />
 <div align="center">
   <a href="https://github.com/Mazharul419/ECS-Forge">
-    <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/6eb39472-28d0-420e-a7c1-93cea094fc1c" />
+<img width="1160" height="911" alt="image" src="https://github.com/user-attachments/assets/d45b94af-536c-4fa1-a785-0e9d365bdfc2" />
   </a>
+
+
 
 <h3 align="center">ECS-Forge</h3>
 
@@ -133,31 +135,42 @@ The application is hosted on AWS - hidden behind an application load balancer.
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
+This is how you can set up your project locally.
 To get a local copy up and running follow these simple example steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+For the scripts annd infrastructure to run you need minimum the following:
+
+* terraform version 1.14.1
+* terragrunt 0.93.13**
+* aws cli 2.32.6 - should connect to AWS account with Admin credentials
+* python 3.12.3
+* GNU bash 5.2.21
+* git 2.43.0
+* Cloudflare account with Domain and Hosted zone
+
+**this is strict requirement since terragrunt newer versions intoduced breaking changes to naming convention, code will not work otherwise
+
+Please refer to the respective stack websites for instructions for installation - alternatively listed in "Built with" section.
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
    git clone https://github.com/Mazharul419/ECS-Forge.git
    ```
-3. Install NPM packages
+2. Copy .env.example - rename to .env and set environment variables from Cloudflare tokens
    ```sh
-   npm install
+   export TF_VAR_cloudflare_api_token="ABDCDEFGHIJKLMNOPQRSTUVWXYZ123456" > replace
+   export CLOUDFLARE_ZONE_ID="a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6" > replace
    ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
+
+   IMPORTANT - should be automatic but check to ensure .env is in your gitignore!
+   
+4. Run Boostrap script in `/infrastucture/bootstrap/bootstrap.sh`
+   ```sh
+   ./infrastucture/bootstrap/bootstrap.sh
    ```
 5. Change git remote url to avoid accidental pushes to base project
    ```sh
