@@ -86,7 +86,16 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started. To avoid retyping too much info, do a search and replace with your text editor for the following: `Mazharul419`, `ECS-Forge`, `twitter_handle`, `mazharul419`, `gmail.com`, `mazharulislam419`, `ECS-Forge`, `project_description`, `project_license`
+This is an end-to-end deployment of the code-server application via ECS Fargate. Upon push to main, or on successful pull request - a Docker image of the application is automatically built and pushed to ECR - where via manual trigger in Github Actions, deployment to Dev and Prod environment (or both) takes place.
+
+The application is hosted on AWS - hidden behind an application load balancer.
+
+## Key Features
+* 35% Cost reduction through use of VPC endpoints vs NAT Gateways
+* Enhanced security posture using short-lived OIDC credentials
+* App protected via intelligent routing through Application Load Balancer (ALB)  
+* Adherence to Don't-Repeat-Yourself (DRY) principle through Terragrunt deployment
+* Secured remote state through S3 native locking
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -94,12 +103,24 @@ Here's a blank template to get started. To avoid retyping too much info, do a se
 
 ### Built With
 
-* [![Terraform][Terraform.io]][Terraform-url]
-* [![Terragrunt][Terragrunt.io]][Terragrunt-url]
+#### Infrastructure/IaC 
+[![Terraform][Terraform.io]][Terraform-url]  [![Terragrunt][Terragrunt.io]][Terragrunt-url]
+[![Docker][Docker]][Docker-url]
+[![AWS][AWS]][AWS-url] [![CloudFlare][CloudFlare]][CloudFlare-url]
+
+#### Languages
+
 * [![Bash][Bash]][Bash-url]
 * [![Python][Python]][Python-url]
 * [![YAML][YAML]][YAML-url]
-* [![Docker][Docker]][Docker-url]
+
+#### 
+
+##
+
+* [![][]][-url]
+* [![][]][-url]
+* [![][]][-url]
 * [![][]][-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -255,5 +276,15 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [YAML-url]: https://yaml.org/
 [Docker]: https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=fff
 [Docker-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+[AWS]: https://custom-icon-badges.demolab.com/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=aws&logoColor=white
+[AWS-url]: https://aws.amazon.com/
+[CloudFlare]: https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white
+[CloudFlare-url]: https://www.cloudflare.com/en-gb/
+[]: 
+[-url]: 
+[]: 
+[-url]: 
+[]: 
+[-url]: 
+[]: 
+[-url]: 
