@@ -19,6 +19,8 @@
 *** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
+<div align="center">
+  
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
@@ -26,13 +28,13 @@
 [![project_license][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
+</div>
 
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/Mazharul419/ECS-Forge">
-    <img src="<img width="517" height="480" alt="image" src="https://github.com/user-attachments/assets/6eb39472-28d0-420e-a7c1-93cea094fc1c" />
+    <img width="300" height="300" alt="image" src="https://github.com/user-attachments/assets/6eb39472-28d0-420e-a7c1-93cea094fc1c" />
   </a>
 
 <h3 align="center">ECS-Forge</h3>
