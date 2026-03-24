@@ -10,9 +10,6 @@
 [![project_license][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-![export-1774305170726](https://github.com/user-attachments/assets/1dfdb3d9-8b23-407f-9f94-336233fdf405)
-=
 </div>
 
 <!-- PROJECT LOGO -->
@@ -24,22 +21,22 @@
 
 <h3 align="center">ECS-Forge</h3>
 
+<img src="https://github.com/user-attachments/assets/1dfdb3d9-8b23-407f-9f94-336233fdf405">
+
   <p align="center">
     An End-to-End deployment of the code-server application hosted on ECS Fargate
     <br />
     <a href="https://github.com/Mazharul419/ECS-Forge"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="">View Demo</a>
-    &middot;
     <a href="https://github.com/Mazharul419/ECS-Forge/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
     <a href="https://github.com/Mazharul419/ECS-Forge/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 
 
-### Demo
-[Click here for vid] https://www.loom.com/share/2402051f736d492990df21803c33065a)
+### 👇 View Demo 👇
+https://www.loom.com/share/2402051f736d492990df21803c33065a
 </div>
 <!-- TABLE OF CONTENTS -->
 <details>
@@ -92,25 +89,27 @@ The application is hosted on AWS - hidden behind an application load balancer.
 
 ### Built With
 
-#### Infrastructure/IaC 
-[![Terraform][Terraform.io]][Terraform-url]  [![Terragrunt][Terragrunt.io]][Terragrunt-url]
+#### Technologies
+[![Terraform][Terraform.io]][Terraform-url]
+[![Terragrunt][Terragrunt.io]][Terragrunt-url]
 [![Docker][Docker]][Docker-url]
-[![AWS][AWS]][AWS-url] [![CloudFlare][CloudFlare]][CloudFlare-url]
+[![AWS][AWS]][AWS-url] [![CloudFlare][CloudFlare]][CloudFlare-url] 
+[![Github Actions][Github Actions]][Github Actions-url]
 
 #### Languages
 
-* [![Bash][Bash]][Bash-url]
-* [![Python][Python]][Python-url]
-* [![YAML][YAML]][YAML-url]
+[![Bash][Bash]][Bash-url]
+[![Python][Python]][Python-url]
+[![YAML][YAML]][YAML-url]
+[![HCL][HCL]][HCL-url]
+[![Git][Git]][Git-url]
 
 #### 
 
 ##
 
-* [![][]][-url]
-* [![][]][-url]
-* [![][]][-url]
-* [![][]][-url]
+
+[![][]][-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -285,7 +284,7 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [Python-url]: https://www.python.org/
 [Bash]: https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnubash&logoColor=white
 [Bash-url]: https://www.gnu.org/software/bash/
-[HCL]: https://img.shields.io/badge/HCL-006BB6?style=for-the-badge&logo=hcl&logoColor=white 
+[HCL]: https://img.shields.io/badge/HCL-844FBA?style=for-the-badge&logo=terraform&logoColor=fff 
 [HCL-url]: https://developer.hashicorp.com/terraform/language
 [YAML]: https://img.shields.io/badge/YAML-CB171E?style=for-the-badge&logo=yaml&logoColor=fff
 [YAML-url]: https://yaml.org/
@@ -295,6 +294,14 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [AWS-url]: https://aws.amazon.com/
 [CloudFlare]: https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white
 [CloudFlare-url]: https://www.cloudflare.com/en-gb/
+[Github Actions]: https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions&logoColor=white 
+[Github Actions-url]: https://github.com/features/actions
+[Git]: https://img.shields.io/badge/Git-F05032??style=for-the-badge&logo=git&logoColor=fff
+[Git-url]: https://git-scm.com/
+[]: 
+[-url]: 
+[]: 
+[-url]: 
 []: 
 [-url]: 
 []: 
