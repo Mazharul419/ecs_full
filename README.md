@@ -275,7 +275,7 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [issues-shield]: https://img.shields.io/github/issues/Mazharul419/ECS-Forge.svg?style=for-the-badge
 [issues-url]: https://github.com/Mazharul419/ECS-Forge/issues
 [license-shield]: https://img.shields.io/github/license/Mazharul419/ECS-Forge.svg?style=for-the-badge
-[license-url]: https://github.com/Mazharul419/ECS-Forge/blob/master/LICENSE.txt
+[license-url]: https://github.com/Mazharul419/ECS-Forge/blob/9f0a4e4c615dc254a6a13f8708dbdc7462444ebe/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/mazharul419
 [product-screenshot]: images/screenshot.png
