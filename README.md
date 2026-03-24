@@ -167,11 +167,11 @@ Please refer to the respective stack websites for instructions for installation 
    ```sh
    ./infrastucture/bootstrap/bootstrap.sh
    ```
-5. Change git remote url to avoid accidental pushes to base project
-   ```sh
-   git remote set-url origin Mazharul419/ECS-Forge
-   git remote -v # confirm the changes
-   ```
+   This creates an S3 bucket for the terraform state, an ECR Repo and Github Actions OIDC role for infrastructure to be deployed!
+    
+6. Go to Github actions and run the "Terragrunt Deploy" workflow:
+   <img width="1883" height="400" alt="image" src="https://github.com/user-attachments/assets/ba53c3f1-d859-4b00-8481-da8bd1ffb10f" />
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -252,9 +252,8 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* []()
-* []()
-* []()
+### CoderCo for providing the assignment, knowledge and community for me to complete this!
+###  
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
