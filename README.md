@@ -103,19 +103,21 @@ The application is hosted on AWS - hidden behind an application load balancer.
 
 [![Terraform][Terraform.io]][Terraform-url]
 [![Terragrunt][Terragrunt.io]][Terragrunt-url]
+[![HCL][HCL]][HCL-url]
 <br>
 #### Version Control and CI/CD:
 
 [![Git][Git]][Git-url]
 [![Github Actions][Github Actions]][Github Actions-url]
+[![YAML][YAML]][YAML-url]
 <br>
 
-#### Languages:
+#### Additional Scripting Languages:
 
 [![Bash][Bash]][Bash-url]
 [![Python][Python]][Python-url]
-[![YAML][YAML]][YAML-url]
-[![HCL][HCL]][HCL-url]
+
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
