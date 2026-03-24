@@ -87,29 +87,36 @@ The application is hosted on AWS - hidden behind an application load balancer.
 
 
 
-### Built With
+## Built With
 
-#### Technologies
+#### Application setup:
+
+[![Linux][Linux]][Linux-url]
+[![Docker][Docker]][Docker-url]
+<br>
+#### DNS/Cloud Infrastructure:
+
+[![CloudFlare][CloudFlare]][CloudFlare-url] 
+[![AWS][AWS]][AWS-url]
+<br>
+#### Infrastructure-As-Code:
+
 [![Terraform][Terraform.io]][Terraform-url]
 [![Terragrunt][Terragrunt.io]][Terragrunt-url]
-[![Docker][Docker]][Docker-url]
-[![AWS][AWS]][AWS-url] [![CloudFlare][CloudFlare]][CloudFlare-url] 
-[![Github Actions][Github Actions]][Github Actions-url]
+<br>
+#### Version Control and CI/CD:
 
-#### Languages
+[![Git][Git]][Git-url]
+[![Github Actions][Github Actions]][Github Actions-url]
+<br>
+
+#### Languages:
 
 [![Bash][Bash]][Bash-url]
 [![Python][Python]][Python-url]
 [![YAML][YAML]][YAML-url]
 [![HCL][HCL]][HCL-url]
-[![Git][Git]][Git-url]
 
-#### 
-
-##
-
-
-[![][]][-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -137,12 +144,12 @@ To get a local copy up and running follow these simple example steps.
 
 For the scripts annd infrastructure to run you need minimum the following:
 
-* terraform version 1.14.1
-* terragrunt 0.93.13**
-* aws cli 2.32.6 - should connect to AWS account with Admin credentials
-* python 3.12.3
+* Terraform version 1.14.1
+* Terragrunt 0.93.13**
+* AWS cli 2.32.6 - should connect to AWS account with Admin credentials
+* Python 3.12.3
 * GNU bash 5.2.21
-* git 2.43.0
+* Git 2.43.0
 * Cloudflare account with Domain and Hosted zone
 
 **this is strict requirement since terragrunt newer versions intoduced breaking changes to naming convention, code will not work otherwise
@@ -182,9 +189,8 @@ Please refer to the respective stack websites for instructions for installation 
 
 This project is useful for someone looking to go deep into learning Devops practices = amd understanding trade-offs and fundemental CI CD pipelines ensuring devs can ship code with ease. 
 
-Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Additional screenshots, code examples and demos to be added as per roadmap below!
 
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -194,7 +200,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 ## Roadmap
 
 - [ ] Complete documentation for code 
-- [ ] Architetural decisions doc
+- [ ] Architectural decisions doc
 - [ ] Add shell environment to Docker image
 - [ ] Add healthcheck to Dockerfile
 - [ ] + Many more
@@ -202,7 +208,6 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 See the [open issues](https://github.com/Mazharul419/ECS-Forge/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- CONTRIBUTING -->
@@ -297,8 +302,8 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [Github Actions-url]: https://github.com/features/actions
 [Git]: https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=fff
 [Git-url]: https://git-scm.com/
-[]: 
-[-url]: 
+[Linux]: https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black
+[Linux-url]: https://www.linux.org/
 []: 
 [-url]: 
 []: 
