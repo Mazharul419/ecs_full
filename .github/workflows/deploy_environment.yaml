@@ -47,10 +47,22 @@ jobs:
           echo "Please type 'confirm-apply' in the confirm_apply field."
           exit 1
 
+      - name: Create common.hcl
+        run: |
+          mkdir -p $GITHUB_WORKSPACE/infrastructure/live/_env
+          cat > $GITHUB_WORKSPACE/infrastructure/live/_env/common.hcl <<EOF
+          locals {
+            container_port     = 8080
+            domain_name        = "mazharulislam.dev"
+            cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          }
+          EOF
+
   Dev:
     name: Dev
     needs: validate
     runs-on: ubuntu-latest
+    environment: dev
     if: inputs.environment == 'dev' || inputs.environment == 'all'
     
     steps:
@@ -71,17 +83,6 @@ jobs:
 
       - name: Print working directory
         run: echo ${{ steps.set-dir.outputs.dir }}
-      
-      - name: Create common.hcl
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/infrastructure/live/_env
-          cat > $GITHUB_WORKSPACE/infrastructure/live/_env/common.hcl <<EOF
-          locals {
-            container_port     = 8080
-            domain_name        = "mazharulislam.dev"
-            cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
-          }
-          EOF
 
       - name: Terragrunt Plan Dev
         if: inputs.action == 'plan'
@@ -117,6 +118,7 @@ jobs:
     name: Prod
     needs: validate
     runs-on: ubuntu-latest
+    environment: prod
     if: inputs.environment == 'prod' || inputs.environment == 'all'
 
     steps:
@@ -137,17 +139,6 @@ jobs:
 
       - name: Print working directory
         run: echo ${{ steps.set-dir.outputs.dir }}
-      
-      - name: Create common.hcl
-        run: |
-          mkdir -p $GITHUB_WORKSPACE/infrastructure/live/_env
-          cat > $GITHUB_WORKSPACE/infrastructure/live/_env/common.hcl <<EOF
-          locals {
-            container_port     = 8080
-            domain_name        = "mazharulislam.dev"
-            cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
-          }
-          EOF
 
       - name: Terragrunt Plan Prod
         if: inputs.action == 'plan'
