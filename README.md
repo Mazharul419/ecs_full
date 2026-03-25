@@ -103,19 +103,21 @@ The application is hosted on AWS - hidden behind an application load balancer.
 
 [![Terraform][Terraform.io]][Terraform-url]
 [![Terragrunt][Terragrunt.io]][Terragrunt-url]
+[![HCL][HCL]][HCL-url]
 <br>
 #### Version Control and CI/CD:
 
 [![Git][Git]][Git-url]
 [![Github Actions][Github Actions]][Github Actions-url]
+[![YAML][YAML]][YAML-url]
 <br>
 
-#### Languages:
+#### Additional Scripting Languages:
 
 [![Bash][Bash]][Bash-url]
 [![Python][Python]][Python-url]
-[![YAML][YAML]][YAML-url]
-[![HCL][HCL]][HCL-url]
+
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -129,9 +131,23 @@ The application is hosted on AWS - hidden behind an application load balancer.
 ### Prod Environment
 <img width="1918" height="995" alt="image" src="https://github.com/user-attachments/assets/5ec9349d-573a-43a5-afc1-e5428d1b801e" />
 
-## Deployments
+## Pipelines
+
+### Terragrunt Deploy
+deploy_environment.yaml
 <img width="1910" height="985" alt="image" src="https://github.com/user-attachments/assets/9496ab93-9af3-4c91-a4ab-236d49e556b8" />
 
+### Build and Push Docker image
+build_push_image.yaml
+<img width="1888" height="555" alt="image" src="https://github.com/user-attachments/assets/17c2cf1f-dd24-4907-a049-4d3d49666265" />
+
+### Update image
+deploy_image.yaml
+<img width="1905" height="931" alt="image" src="https://github.com/user-attachments/assets/1b78891e-2a17-4c8f-a99b-4947111a5270" />
+
+### Terragrunt Destroy
+destroy_environment.yaml
+<img width="1897" height="954" alt="image" src="https://github.com/user-attachments/assets/16e75764-5676-4363-9414-11e2f0c2ffd0" />
 
 
 <!-- GETTING STARTED -->
@@ -275,7 +291,7 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [issues-shield]: https://img.shields.io/github/issues/Mazharul419/ECS-Forge.svg?style=for-the-badge
 [issues-url]: https://github.com/Mazharul419/ECS-Forge/issues
 [license-shield]: https://img.shields.io/github/license/Mazharul419/ECS-Forge.svg?style=for-the-badge
-[license-url]: https://github.com/Mazharul419/ECS-Forge/blob/master/LICENSE.txt
+[license-url]: https://github.com/Mazharul419/ECS-Forge/tree/main?tab=MIT-1-ov-file
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/mazharul419
 [product-screenshot]: images/screenshot.png
@@ -304,13 +320,3 @@ Project Link: [https://github.com/Mazharul419/ECS-Forge](https://github.com/Mazh
 [Git-url]: https://git-scm.com/
 [Linux]: https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black
 [Linux-url]: https://www.linux.org/
-[]: 
-[-url]: 
-[]: 
-[-url]: 
-[]: 
-[-url]: 
-[]: 
-[-url]: 
-[]: 
-[-url]: 
