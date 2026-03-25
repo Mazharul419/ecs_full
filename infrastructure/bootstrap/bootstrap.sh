@@ -220,6 +220,8 @@ if [ -n "$EXISTING_IMAGE" ]; then
   read -p "Do you want to push this image instead? (y/n) " confirm
 
   if [[ "$confirm" = "y" || "$confirm" = "Y" ]]; then
+    echo "Logging into ECR..."
+    aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$ECR_URL"
     echo "Pushing image..."
     docker push "${ECR_URL}:${INITIAL_TAG}"
     echo "Image pushed: ${ECR_URL}:${INITIAL_TAG}"
