@@ -213,9 +213,11 @@ Also explain how applications can access AWS services privately
 
 According to [Docker docs](https://docs.docker.com/reference/dockerfile/) the Dockerfile is a text file that contains all the commands that a user would run on a command line that tells Docker to build the image. 
 <br>
-The ReadME is for any person visiting the repo to understand at a high level what the project does and how they can set this up for themselves.
+The ReadME.md file is for any person visiting the repo to understand at a high level what the project does and how they can set this up for themselves.
 <br>
-The LICENSE specifies how the repo can be distributed and used.
+The LICENSE.txt file specifies how the repo can be distributed and used.
+<br>
+The app directory contains the application itself - though it is not used in the Dockerfile (due to issues with git submodules not pulling the application properly)
 
 5. Root Configuration (terragrunt.hcl)
 File Location
