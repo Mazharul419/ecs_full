@@ -121,6 +121,107 @@ The application is hosted on AWS - hidden behind an application load balancer.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Project Structure
+```
+.
+├── Dockerfile
+├── LICENSE
+├── README.md
+├── app
+├── architecture
+│   └── decisions.md
+├── documentation
+│   └── README.md
+├── infrastructure
+│   ├── backend.tf
+│   ├── bootstrap
+│   │   ├── ReadMe.md
+│   │   ├── bootstrap.sh
+│   │   └── destroy.sh
+│   ├── live
+│   │   ├── _env
+│   │   │   └── common.hcl
+│   │   ├── dev
+│   │   │   ├── acm
+│   │   │   │   └── terragrunt.hcl
+│   │   │   ├── alb
+│   │   │   │   └── terragrunt.hcl
+│   │   │   ├── dns
+│   │   │   │   └── terragrunt.hcl
+│   │   │   ├── ecs
+│   │   │   │   └── terragrunt.hcl
+│   │   │   ├── env.hcl
+│   │   │   ├── security-groups
+│   │   │   │   └── terragrunt.hcl
+│   │   │   ├── vpc
+│   │   │   │   └── terragrunt.hcl
+│   │   │   └── vpc-endpoints
+│   │   │       └── terragrunt.hcl
+│   │   ├── global
+│   │   │   ├── ecr
+│   │   │   │   └── terragrunt.hcl
+│   │   │   └── oidc
+│   │   │       └── terragrunt.hcl
+│   │   └── prod
+│   │       ├── acm
+│   │       │   └── terragrunt.hcl
+│   │       ├── alb
+│   │       │   └── terragrunt.hcl
+│   │       ├── dns
+│   │       │   └── terragrunt.hcl
+│   │       ├── ecs
+│   │       │   └── terragrunt.hcl
+│   │       ├── env.hcl
+│   │       ├── security-groups
+│   │       │   └── terragrunt.hcl
+│   │       ├── vpc
+│   │       │   └── terragrunt.hcl
+│   │       └── vpc-endpoints
+│   │           └── terragrunt.hcl
+│   ├── modules
+│   │   ├── acm
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── alb
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── dns
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── ecr
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── ecs
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── oidc
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── security-groups
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   ├── vpc
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   └── vpc-endpoints
+│   │       ├── main.tf
+│   │       ├── outputs.tf
+│   │       └── variables.tf
+│   ├── provider.tf
+│   └── terragrunt.hcl
+└── other
+    ├── both.tf
+    ├── createpolicy.tf
+    └── deletepolicy.tf
+```
 
 ## Application
 
