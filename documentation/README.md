@@ -3,25 +3,33 @@
 This is documentation for the ECS-Forge repo - it contains docs related to all the code set up for this project.
 
 ## Table of Contents
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#traffic-flow-explained">Traffic flow explained</a>
+      <ul>
+        <li><a href="#access-to-website">Access to website</a></li>
+        <li><a href="#load-balancer-and-remaining">Load balancer and remaining</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#technology-stack-explained">Technology stack explained</a>
+      <ul>
+        <li><a href="#infrastructure-as-code-tools">Infrastructure-as-code tools</a></li>
+          <ul>
+          <li><a href="#terraform">Terraform</a></li>
+          <li><a href="#terragrunt">Terragrunt</a></li>
+          <li><a href="#aws-services-used">AWS services used</a></li>
+          </ul>
+      </ul>
+        <li><a href="#project-structure">Project structure</a></li>
+    </li>
+  </ol>
+</details>
 
-[Traffic Flow Explained](https://github.com/Mazharul419/ECS-Forge/edit/main/documentation/README.md#traffic-flow-explained)
-<br>
-&nbsp; [Access to website](https://github.com/Mazharul419/ECS-Forge/edit/main/documentation/README.md#access-to-website)
-<br>
-&nbsp; [Load Balancer and remaining](https://github.com/Mazharul419/ECS-Forge/edit/main/documentation/README.md#load-balancer-and-remaining)
-<br><br>
-[Technology Stack Explained](https://github.com/Mazharul419/ECS-Forge/edit/main/documentation/README.md#technology-stack-explained)
-<br>
-&nbsp; [Infrastructure as Code Tools]()
-<br>
-&nbsp; [Terraform]()
-<br>
-&nbsp; [Terragrunt]()
-<br>
-&nbsp; [AWS Services Used]()
-<br><br>
-[Project Structure]()
-<br>
+
 [Dockerfile, LICENSE, README.md, and App](https://github.com/Mazharul419/ECS-Forge/edit/main/documentation/README.md#dockerfile-license-readmemd)
 &nbsp;<br>
 []()
@@ -33,15 +41,14 @@ This is documentation for the ECS-Forge repo - it contains docs related to all t
 
 ## Access to website
 
-![image](https://capacities-files.s3.eu-central-1.amazonaws.com/private/ce5be6b9-2b98-4142-bb70-1cabd8dc3727/raw.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA5VTNRR6EBR56K2NK%2F20260329%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20260329T093514Z&X-Amz-Expires=43200&X-Amz-Signature=a9b805365e3f128274138b6b9b7d2afe99eb2155becb4f62c5feaff5839c6b7f&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
-
+![alt text](image.png)
 
 
 To access the live application in production environment, the user types in ***tm.mazharulislam.dev***(or ***tm-dev.mazharulislam.dev*** if accessing development environment).
 
 A DNS (Domain Name System) query takes place - the client sends out tm.mazharulislam.dev and receives the IP address of the public-facing Application Load Balancer (ALB) allowing it to connect to the application hosted in AWS.
 
-![image](https://capacities-files.s3.eu-central-1.amazonaws.com/private/8756b937-d7ab-48cd-8576-1f2925e75a22/raw.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA5VTNRR6EBR56K2NK%2F20260329%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Date=20260329T110405Z&X-Amz-Expires=43200&X-Amz-Signature=8a1480f580893048151797a17c7fceb96af6081edf8761e6115bc12be3366c61&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
+![alt text](image-1.png)
 [image - Notes](https://app.capacities.io/842d982e-dafe-4919-b038-f1da4582566c/8756b937-d7ab-48cd-8576-1f2925e75a22)
 
 
@@ -98,6 +105,8 @@ Also explain how applications can access AWS services privately
 ## AWS Services Used
 
 # Project Structure
+
+## Overview
 
 ```
 .
