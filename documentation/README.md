@@ -24,17 +24,20 @@ This is documentation for the ECS-Forge repo - it contains docs related to all t
           <li><a href="#aws-services-used">AWS services used</a></li>
           </ul>
       </ul>
-        <li><a href="#project-structure">Project structure</a></li>
+    </li>
+    <li>
+      <a href="#project-structure">Project Structure</a>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+          <ul>
+          <li><a href="#dockerfile,-license,-readme.md,-and-app">Dockerfile, LICENSE, README.md, and App</a></li>
+          <li><a href="#architecture---decisions.md-file-and-documentation---readme.md-file">Architecture - decisions.md file and Documentation - README.md file</a></li>
+          <li><a href="#infrastructure-directory">Infrastructure directory</a></li>
+          </ul>
+      </ul>
     </li>
   </ol>
 </details>
-
-
-[Dockerfile, LICENSE, README.md, and App](https://github.com/Mazharul419/ECS-Forge/edit/main/documentation/README.md#dockerfile-license-readmemd)
-&nbsp;<br>
-[]()
-<br>
-[]()
 
 
 # Traffic Flow Explained
@@ -49,7 +52,6 @@ To access the live application in production environment, the user types in ***t
 A DNS (Domain Name System) query takes place - the client sends out tm.mazharulislam.dev and receives the IP address of the public-facing Application Load Balancer (ALB) allowing it to connect to the application hosted in AWS.
 
 ![alt text](image-1.png)
-[image - Notes](https://app.capacities.io/842d982e-dafe-4919-b038-f1da4582566c/8756b937-d7ab-48cd-8576-1f2925e75a22)
 
 
 Assuming there is no cache stored at any stage - [the following](https://www.cloudflare.com/en-gb/learning/dns/what-is-dns/) will happen:
@@ -253,7 +255,7 @@ The README.md file (this file) in the documentation directory is documentation f
     └── terragrunt.hcl
 ```
 This directory contains EVERYTHING related to the infrastructure required to deploy the application.
-<br><br>
+
 The backend.tf
 
 5. Root Configuration (terragrunt.hcl)
