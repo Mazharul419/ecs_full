@@ -3,47 +3,33 @@
 This is documentation for the ECS-Forge repo - it contains docs related to all the code set up for this project.
 
 ## Table of Contents
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#traffic-flow-explained">Traffic flow explained</a>
-      <ul>
-        <li><a href="#access-to-website">Access to website</a></li>
-        <li><a href="#load-balancer-and-remaining">Load balancer and remaining</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#technology-stack-explained">Technology stack explained</a>
-      <ul>
-        <li><a href="#infrastructure-as-code-tools">Infrastructure-as-code tools</a></li>
-          <ul>
-          <li><a href="#terraform">Terraform</a></li>
-          <li><a href="#terragrunt">Terragrunt</a></li>
-          <li><a href="#aws-services-used">AWS services used</a></li>
-          </ul>
-      </ul>
-    </li>
-    <li>
-      <a href="#project-structure">Project Structure</a>
-      <ul>
-        <li><a href="#overview">Overview</a></li>
-          <ul>
-          <li><a href="#dockerfile,-license,-readme.md,-and-app">Dockerfile, LICENSE, README.md, and App</a></li>
-          <li><a href="#architecture---decisions.md-file-and-documentation---readme.md-file">Architecture - decisions.md file and Documentation - README.md file</a></li>
-          <li><a href="#infrastructure-directory">Infrastructure directory</a>
-            <ul>
-            <li><a href="#backend,-provider.tf-files">Backend, provider.tf files</a></li>
-            <li><a href="#infrastructure---live-directory">Infrastructure - live directory</a></li>
-            <li><a href="#[]">[]</a></li>
-            </ul>
-          </li>
-          </ul>
-      </ul>
-    </li>
-  </ol>
-</details>
+
+- [Intro](#intro)
+  - [Table of Contents](#table-of-contents)
+- [Traffic Flow Explained](#traffic-flow-explained)
+  - [Access to website](#access-to-website)
+- [Load Balancer and remaining](#load-balancer-and-remaining)
+- [Technology Stack Explained](#technology-stack-explained)
+  - [Infrastructure as Code Tools](#infrastructure-as-code-tools)
+  - [Terraform](#terraform)
+  - [Terragrunt](#terragrunt)
+  - [AWS Services Used](#aws-services-used)
+- [Project Structure](#project-structure)
+  - [Overview](#overview)
+  - [Structure Explained](#structure-explained)
+    - [Dockerfile, LICENSE, README.md, and App](#dockerfile-license-readmemd-and-app)
+    - [Architecture - decisions.md file and Documentation - README.md file](#architecture---decisionsmd-file-and-documentation---readmemd-file)
+    - [Infrastructure directory](#infrastructure-directory)
+      - [Backend, provider.tf files](#backend-providertf-files)
+      - [Infrastructure - live directory](#infrastructure---live-directory)
+      - [Infrastructure - modules directory](#infrastructure---modules-directory)
+- [DEEP DIVE](#deep-dive)
+  - [Root Configuration (terragrunt.hcl)](#root-configuration-terragrunthcl)
+    - [File Location](#file-location)
+    - [Locals Block](#locals-block)
+    - [Remote State Block](#remote-state-block)
+    - [Generate Provider Block](#generate-provider-block)
+
 
 # Traffic Flow Explained
 
@@ -402,7 +388,7 @@ locals {
 }
 ```
 
-This block defines values that will be used [elsewhere in the configuration](https://docs.terragrunt.com/reference/hcl/blocks/#:~:text=The%20locals%20block%20is%20used%20to%20define%20aliases%20for%20Terragrunt%20expressions%20that%20can%20be%20referenced%20elsewhere%20in%20configuration.). These are values are REFERENCED by Terragrunt in almost every single unit that is run.
+This block defines values that will be used [elsewhere in the configuration](https://docs.terragrunt.com/reference/hcl/blocks/#locals). These are values are REFERENCED by Terragrunt in almost every single unit that is run.
 
 When they call terraform modules, they POPULATE the empty values set for variables (variables.tf).
 
@@ -420,7 +406,7 @@ The block includes:
 <br><br>
 >The `environment = element(split("/", path_relative_to_include()), 1)` has both Terragrunt and HCl functions within which grab the environment based on the directory structure below:
 >
->`path_relative_to_include()` [returns the relative path](https://docs.terragrunt.com/reference/hcl/functions/#:~:text=path_relative_to_include()%20returns%20the%20relative%20path%20between%20the%20current%20terragrunt.hcl%20file%20and%20the%20path%20specified%20in%20its%20include%20block) between the child terragrunt.hcl and the parent terragrunt.hcl at root
+>`path_relative_to_include()` [returns the relative path](https://docs.terragrunt.com/reference/hcl/functions/#path_relative_to_include) between the child terragrunt.hcl and the parent terragrunt.hcl at root
 >
 >For example if child is at `live/dev/vpc/terragrunt.hcl` - and since parent is at repo root, this returns `live/dev/vpc`
 >
@@ -434,7 +420,7 @@ The block includes:
 >
 >A: I do not have to manually append the two locals here>
 >
->B: IMPORTANTLY means if another account tries to create buckets using this suffix [their request is rejected - preventing bucket takeover attacks!](https://aws.amazon.com/blogs/aws/introducing-account-regional-namespaces-for-amazon-s3-general-purpose-buckets/#:~:text=If%20another%20account%20tries%20to%20create%20buckets%20using%20my%20account%E2%80%99s%20suffix%2C%20their%20requests%20will%20be%20automatically%20rejected.)
+>B: IMPORTANTLY means if another account tries to create buckets using this suffix [their request is rejected - preventing bucket takeover attacks!](https://aws.amazon.com/blogs/aws/introducing-account-regional-namespaces-for-amazon-s3-general-purpose-buckets/)
 
 ### Remote State Block
 
@@ -457,11 +443,11 @@ remote_state {
 }
 ```
 
-This block is used to [configure the remote state configuration](https://docs.terragrunt.com/reference/hcl/blocks/#:~:text=The%20remote_state%20block%20is%20used%20to%20configure%20how%20Terragrunt%20will%20set%20up%20the%20remote%20state%20configuration%20of%20your%20OpenTofu/Terraform%20code.) for terraform.
+This block is used to [configure the remote state configuration](https://docs.terragrunt.com/reference/hcl/blocks/#remote_state) for terraform.
 
 With `backend = s3` - the backend is defined as Amazon Web Service's (AWS) Simple Storage Solution (S3) - this is highly available cloud storage which provides remote storage for the terraform state. Contrasting to storing locally this is much more reliable since AWS manages this specifically and [provides 99.99% availability](https://docs.aws.amazon.com/AmazonS3/latest/userguide/DataDurability.html) for objects stored in it over a year.
 
-The `generate` block requests terragrunt to [generate a `backend.tf` in the working directory](https://oneuptime.com/blog/post/2026-02-23-how-to-use-the-generate-block-in-terragrunt/view#:~:text=creates%20provider.tf%20in%20the%20working%20directory%20with%20the%20specified%20contents.) with the specified configuration.
+The `generate` block requests terragrunt to [generate a `backend.tf` in the working directory](https://oneuptime.com/blog/post/2026-02-23-how-to-use-the-generate-block-in-terragrunt/view#what-the-generate-block-does) with the specified configuration.
 
 `path = "backend.tf"` provides the path where the backend.tf file is generated - set to the same directory as this file.
 
@@ -469,19 +455,153 @@ The `generate` block requests terragrunt to [generate a `backend.tf` in the work
 
 `config` is a map that configures the state with:
 
-- `bucket` as the local value defined earlier
-- `key` set up such that
+- `bucket       = local.bucket_name` this is the local value defined earlier in `locals` block
+- `key          = "${path_relative_to_include()}/terraform.tfstate"` uses the earlier `path_relative_to_include` function to ensure each child terragrunt.hcl file [has a remote state at a different key](https://docs.terragrunt.com/reference/hcl/functions/#path_relative_to_include)
+- `encrypt      = true` [enables server-side encryption](https://docs.terragrunt.com/reference/hcl/blocks/#terraform) of the state file
+- `use_lockfile = true`[enables native s3 state locking](https://docs.terragrunt.com/reference/hcl/blocks/#backend)
 
 <br>
 
 >ADR-001: Remote S3 backend
 >
+>ADR-002: S3 Server-side encryption
+>
+>ADR-003: S3 native state-locking
+>
 >(LOOK INTO REMOTE STATE BOOTSTRAP BEING SORTED BY TERRAGRUNT https://docs.terragrunt.com/features/units/state-backend/)
 
-Generate Provider Block
+### Generate Provider Block
+
+```
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  
+  contents = <<EOF
+terraform {
+  required_version = "~> 1.14" # Allows 1.14.0, 1.14.1 etc. but not 1.15 - no major/minor suprises
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+    cloudflare = {
+  source  = "cloudflare/cloudflare"
+  version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "${local.aws_region}"
+
+  default_tags {
+    tags = {
+    Project     = "${local.project_name}"
+    Environment = "${local.environment}"
+    ManagedBy   = "Terragrunt"
+    Repository  = "github.com/Mazharul419/ecs_full"
+    }
+  }
+}
+
+provider "cloudflare" {
+  api_token = var.cloudflare_api_token
+}
+
+variable "cloudflare_api_token" {
+  type      = string
+  sensitive = true
+}
+
+EOF
+}
+```
+
+This block is used to define the `required_providers` and `provider` configuration for each child terragrunt.hcl file.
+
+A provider is [a Terraform plugin](https://developer.hashicorp.com/terraform/language/block/provider). It helps Terraform manage real-world infrastructure with their own resources and data sources.
+
+```
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
 
 
-6. Terraform Modules
+  contents = <<EOF
+.
+.
+.
+EOF
+}
+```
+
+The `generate` block requests terragrunt to [generate a `provider.tf` in the working directory](https://oneuptime.com/blog/post/2026-02-23-how-to-use-the-generate-block-in-terragrunt/view#what-the-generate-block-does) with the specified configuration. It is named `"provider"` for Terragrunt's reference.
+
+`path = "provider.tf"` provides the path where the backend.tf file is generated - set to the same directory as this file.
+
+`if_exists = "overwrite_terragrunt"` tells Terragrunt to overwrite the TERRAGRUNT GENERATED provider.tf file if it already exists. This is specificied to prevent overwriting a human-written provider.tf file if that was created.
+
+```
+  contents = <<EOF
+.
+.
+.
+EOF
+```
+
+This is a "heredoc" style string literal supported by Terraform which [contains multi-lines string literals](https://developer.hashicorp.com/terraform/language/expressions/strings#heredoc-strings) - in this context it allows specifying the generated file content.
+
+```
+terraform {
+  required_version = "~> 1.14" # Allows 1.14.0, 1.14.1 etc. but not 1.15 - no major/minor suprises
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.0"
+    }
+    cloudflare = {
+  source  = "cloudflare/cloudflare"
+  version = "~> 5.0"
+    }
+  }
+}
+```
+The `terraform{}` block [defines how terraform behaves](https://developer.hashicorp.com/terraform/language/block/terraform#terraform-block)
+
+`required version` - [specifies which version of Terraform CLI](https://developer.hashicorp.com/terraform/language/block/terraform#required_version) is allowed to run the configuration - set to 1.14, but allows 1.14.0, 1.14.1 but not minor (1.15, 1.16) or major bumps (2.0.0, 3.0.0) in version
+
+1.14.8 as of writing (03/04/2026) is the latest version
+
+`required providers` - [specifies provider plugins required](https://developer.hashicorp.com/terraform/language/block/terraform#required_providers) to create and manage their respective resources 
+
+`aws` and `cloudflare` are defined as part of this with their respective sources and versions - with the same increments of versions acceptable as terraform.
+
+Latest versions as of writing:
+
+`aws` : 6.39.0
+`cloudflare` : 5.19.0-beta.4
+
+> You can find the latest versions and commands to use their configuration on [Hashicorps Official website](https://registry.terraform.io/browse/providers)
+
+```
+provider "aws" {
+  region = "${local.aws_region}"
+
+  default_tags {
+    tags = {
+    Project     = "${local.project_name}"
+    Environment = "${local.environment}"
+    ManagedBy   = "Terragrunt"
+    Repository  = "github.com/Mazharul419/ecs_full"
+    }
+  }
+}
+```
+
+A provider block is directly added within
+
+1. Terraform Modules
 6.1 VPC Module
 Data Source: Availability Zones
 VPC Resourcs
